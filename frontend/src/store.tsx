@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { combineReducers } from "@reduxjs/toolkit";
-import globalReducer from "./features/globalSlce";
+import globalReducer from "./features/globalSlice";
 
 const rootReducer = combineReducers({});
 
