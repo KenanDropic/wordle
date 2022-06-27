@@ -9,7 +9,7 @@ lerna-debug.log*
 
 node_modules
 /node_modules
-/frontend/words-data.txt
+/frontend/src/words-data.txt
 dist
 dist-ssr
 *.local
