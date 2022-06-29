@@ -13,8 +13,7 @@ interface InitialState {
     letterPosition: number;
   };
   words: Words;
-  isSubmited: boolean;
-  isFetched: boolean;
+  disabledLetters: string[];
 }
 
 const initialState: InitialState = {
@@ -34,8 +33,7 @@ const initialState: InitialState = {
     wordSet: new Set(),
     todaysWord: "",
   },
-  isSubmited: false,
-  isFetched: false,
+  disabledLetters: [],
 };
 
 export const getRandomWord = createAsyncThunk("words/getRandom", async () => {
@@ -77,10 +75,9 @@ const globalSlice = createSlice({
         attempt: state.currentAttempt.attempt + 1,
         letterPosition: 0,
       };
-      state.isSubmited = true;
     },
-    resetIsSubmited: (state) => {
-      state.isSubmited = false;
+    setDisabledLettersArray: (state, action: PayloadAction<string>) => {
+      state.disabledLetters = [...state.disabledLetters, action.payload];
     },
   },
   extraReducers(builder) {
@@ -96,7 +93,11 @@ const globalSlice = createSlice({
   },
 });
 
-export const { setBoard, setLetterPosition, setAttempt, resetIsSubmited } =
-  globalSlice.actions;
+export const {
+  setBoard,
+  setLetterPosition,
+  setAttempt,
+  setDisabledLettersArray,
+} = globalSlice.actions;
 
 export default globalSlice.reducer;

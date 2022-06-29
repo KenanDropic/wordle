@@ -9,9 +9,10 @@ import { useAppDispatch, useAppSelector } from "../features/hooks/hooks";
 interface KeyValues {
   value: string;
   bigKey?: boolean;
+  shouldDisable?: boolean;
 }
 
-const Key: React.FC<KeyValues> = ({ value, bigKey }) => {
+const Key: React.FC<KeyValues> = ({ value, bigKey, shouldDisable }) => {
   const dispatch = useAppDispatch();
   const { currentAttempt } = useAppSelector((state) => state.global);
 
@@ -31,7 +32,11 @@ const Key: React.FC<KeyValues> = ({ value, bigKey }) => {
   };
 
   return (
-    <div className="key" id={`${bigKey && "big"}`} onClick={handleClick}>
+    <div
+      className="key"
+      id={`${bigKey ? "big" : shouldDisable && "disabled"}`}
+      onClick={handleClick}
+    >
       {value === "DELETE" ? (
         <i className="fa-solid fa-delete-left" style={{ fontSize: "30px" }}></i>
       ) : (
