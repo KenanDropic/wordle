@@ -9,6 +9,7 @@ interface Props {
 
 const Letter: React.FC<Props> = ({ attemptValue, letterPosition }) => {
   const [letterState, setLetterState] = useState<string>();
+  const [flipState, setFlipState] = useState<string>();
   const dispatch = useAppDispatch();
   const {
     board,
@@ -25,7 +26,13 @@ const Letter: React.FC<Props> = ({ attemptValue, letterPosition }) => {
   useEffect(() => {
     // add id's to each letter in row,based on it being in correct place,not being in correct place but in a word,not in a word at all.
     if (currentAttempt.attempt > attemptValue) {
-      setLetterState(correct ? "correct" : almost ? "almost" : "error");
+      // flip letters with delay
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+          setLetterState(correct ? "correct" : almost ? "almost" : "error");
+          setFlipState("flip");
+        }, letterPosition * 250);
+      }
     }
 
     // disable all letters that are entered but are not included in word we are trying to guess
@@ -37,7 +44,7 @@ const Letter: React.FC<Props> = ({ attemptValue, letterPosition }) => {
   }, [currentAttempt.attempt]);
 
   return (
-    <div className="letter" id={letterState}>
+    <div className={`letter ${flipState}`} id={letterState}>
       {letter}
     </div>
   );
