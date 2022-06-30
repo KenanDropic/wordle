@@ -2,6 +2,7 @@ import React from "react";
 import {
   setAttempt,
   setBoard,
+  setGameOver,
   setLetterPosition,
 } from "../features/globalSlice";
 import { useAppDispatch, useAppSelector } from "../features/hooks/hooks";
@@ -12,14 +13,47 @@ interface KeyValues {
   shouldDisable?: boolean;
 }
 
+type ClickFn = () => void;
+
 const Key: React.FC<KeyValues> = ({ value, bigKey, shouldDisable }) => {
   const dispatch = useAppDispatch();
-  const { currentAttempt } = useAppSelector((state) => state.global);
+  const {
+    currentAttempt,
+    words: { todaysWord, wordSet },
+    board,
+  } = useAppSelector((state) => state.global);
 
-  const handleClick = () => {
+  const handleClick: ClickFn = () => {
     if (value === "ENTER") {
       if (currentAttempt.letterPosition !== 5) return;
-      dispatch(setAttempt());
+
+      if (currentAttempt.letterPosition !== 5) return;
+      // form a word with entered letters
+      let guessedWord: string = "";
+      for (let i = 0; i < 5; i++) {
+        guessedWord += board[currentAttempt.attempt][i];
+      }
+
+      // check if word we entered is inside words txt
+      if (wordSet.has(`${guessedWord.toLowerCase()}\r`)) {
+        dispatch(setAttempt());
+      } else {
+        alert("Word Not Found");
+      }
+
+      // word guessed correct - end game
+      if (guessedWord.toLowerCase() === todaysWord) {
+        dispatch(setGameOver(true));
+      }
+
+      // run out of attempts but didn't guessed word
+      if (
+        currentAttempt.attempt === 5 &&
+        guessedWord.toLowerCase() !== todaysWord &&
+        wordSet.has(`${guessedWord.toLowerCase()}\r`)
+      ) {
+        dispatch(setGameOver(false));
+      }
     } else if (value === "DELETE") {
       if (currentAttempt.letterPosition === 0) return;
       dispatch(setLetterPosition("-"));

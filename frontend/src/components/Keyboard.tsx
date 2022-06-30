@@ -27,9 +27,8 @@ const Keyboard: React.FC = () => {
     (e: React.KeyboardEvent<HTMLDivElement> | KeyboardEvent) => {
       if (e.key.toLowerCase() == "enter") {
         if (currentAttempt.letterPosition !== 5) return;
-
         // form a word with entered letters
-        let guessedWord = "";
+        let guessedWord: string = "";
         for (let i = 0; i < 5; i++) {
           guessedWord += board[currentAttempt.attempt][i];
         }
@@ -47,7 +46,11 @@ const Keyboard: React.FC = () => {
         }
 
         // run out of attempts but didn't guessed word
-        if (currentAttempt.attempt === 5) {
+        if (
+          currentAttempt.attempt === 5 &&
+          guessedWord.toLowerCase() !== todaysWord &&
+          wordSet.has(`${guessedWord.toLowerCase()}\r`)
+        ) {
           dispatch(setGameOver(false));
         }
       } else if (e.key.toLowerCase() == "backspace") {
