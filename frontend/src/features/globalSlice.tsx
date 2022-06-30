@@ -1,10 +1,17 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {
+  AsyncThunk,
+  createAsyncThunk,
+  createSlice,
+  PayloadAction,
+} from "@reduxjs/toolkit";
 import words from "../words-data.txt";
 
 interface Words {
   wordSet: Set<any>;
   todaysWord: string;
 }
+
+type grwFnc = () => object;
 
 interface GameOver {
   isOver: boolean;
@@ -46,11 +53,19 @@ const initialState: InitialState = {
   },
 };
 
-export const getRandomWord = createAsyncThunk("words/getRandom", async () => {
+export const getRandomWord: AsyncThunk<
+  | {
+      resultArray: string[];
+      todaysWord: string;
+    }
+  | undefined,
+  void,
+  {}
+> = createAsyncThunk("words/getRandom", async () => {
   try {
-    let todaysWord;
-    const data = await fetch(words);
-    const result = await data.text();
+    let todaysWord: string;
+    const data: Response = await fetch(words);
+    const result: string = await data.text();
     const resultArray = result.split("\n");
     todaysWord = resultArray[Math.floor(Math.random() * resultArray.length)];
 
