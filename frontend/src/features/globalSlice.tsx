@@ -6,6 +6,11 @@ interface Words {
   todaysWord: string;
 }
 
+interface GameOver {
+  isOver: boolean;
+  isWon: boolean;
+}
+
 interface InitialState {
   board: string[][];
   currentAttempt: {
@@ -14,6 +19,7 @@ interface InitialState {
   };
   words: Words;
   disabledLetters: string[];
+  gameOver: GameOver;
 }
 
 const initialState: InitialState = {
@@ -34,6 +40,10 @@ const initialState: InitialState = {
     todaysWord: "",
   },
   disabledLetters: [],
+  gameOver: {
+    isOver: false,
+    isWon: false,
+  },
 };
 
 export const getRandomWord = createAsyncThunk("words/getRandom", async () => {
@@ -79,6 +89,10 @@ const globalSlice = createSlice({
     setDisabledLettersArray: (state, action: PayloadAction<string>) => {
       state.disabledLetters = [...state.disabledLetters, action.payload];
     },
+    setGameOver: (state, action: PayloadAction<boolean>) => {
+      state.gameOver.isOver = true;
+      state.gameOver.isWon = action.payload;
+    },
   },
   extraReducers(builder) {
     builder.addCase(getRandomWord.fulfilled, (state, action) => {
@@ -98,6 +112,7 @@ export const {
   setLetterPosition,
   setAttempt,
   setDisabledLettersArray,
+  setGameOver,
 } = globalSlice.actions;
 
 export default globalSlice.reducer;
