@@ -12,6 +12,9 @@ type asyncHandlerTs = (
 
 export interface CustomRequest extends Request {}
 
+// @desc    Register User
+// @route   POST /api/v1/auth/register
+// @access  Public
 export const register = asyncHandler(
   async (req: any, res: any, next: NextFunction) => {
     if (!req.body?.username || !req.body?.password || !req.body?.email) {
@@ -35,7 +38,7 @@ export const register = asyncHandler(
     } = new User(req.body);
 
     const access_token: string = user.getAccessToken();
-    const refresh_token: string = user.getRefreshToken();
+    // const refresh_token: string = user.getRefreshToken();
 
     await user.save();
 
@@ -43,12 +46,15 @@ export const register = asyncHandler(
   }
 );
 
+// @desc    Login User
+// @route   POST /api/v1/auth/login
+// @access  Public
 export const login = asyncHandler(async (req: any, res: any) => {
   const cookies = req.cookies;
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(404).json({ message: "Provide all values" });
+    return res.status(400).json({ message: "Provide all values" });
   }
 
   const user: UserT | null = await User.findOne({
@@ -90,30 +96,31 @@ export const login = asyncHandler(async (req: any, res: any) => {
 
     res.clearCookie("jwt", {
       httpOnly: true,
-      sameSite: "none",
-      // secure: true,
+      sameSite: "None",
+      secure: true,
     });
   }
 
   user.refreshToken = [...newRTArray, refresh_token];
-  const result = await user.save();
+  await user.save();
 
   // Creates Secure Cookie with refresh token
   res.cookie("jwt", refresh_token, {
     httpOnly: true,
-    // secure: true,
-    sameSite: "none",
+    secure: true,
+    sameSite: "None",
     maxAge: 24 * 60 * 60 * 1000,
   });
 
-  // Send authorization roles and access token to user
+  // Send access token & refresh token to user
   res.json({
-    success: true,
     accessToken: access_token,
-    refreshToken: refresh_token,
   });
 });
 
+// @desc    Get new refresh token
+// @route   GET /api/v1/auth/token
+// @access  Private
 export const handleRefreshToken = asyncHandler(
   async (req: any, res: any, next: NextFunction) => {
     const cookies = req.cookies;
@@ -121,16 +128,14 @@ export const handleRefreshToken = asyncHandler(
     const refreshToken: string = cookies.jwt;
     res.clearCookie("jwt", {
       httpOnly: true,
-      sameSite: "none",
-      //  secure: true
+      sameSite: "None",
+      secure: true,
     });
-
     const user:
       | (UserT & {
           _id: Types.ObjectId;
         })
       | null = await User.findOne({ refreshToken }).exec();
-
     if (!user) {
       jwt.verify(
         refreshToken,
@@ -140,17 +145,14 @@ export const handleRefreshToken = asyncHandler(
           decoded: string | jwt.JwtPayload | undefined
         ) => {
           if (err) return res.sendStatus(403); //Forbidden
-
           let hackedUser:
             | (UserT & {
                 _id: Types.ObjectId;
               })
             | null;
-
           // Delete refresh tokens of hacked user
           if (decoded !== undefined) {
             hackedUser = await User.findOne((decoded as any).id);
-
             if (hackedUser !== null) {
               hackedUser.refreshToken = [];
               await hackedUser.save();
@@ -160,9 +162,7 @@ export const handleRefreshToken = asyncHandler(
       );
       return res.sendStatus(403); //Forbidden
     }
-
     const newRTArray = user.refreshToken.filter((rt) => rt !== refreshToken);
-
     // evaluate jwt
     jwt.verify(
       refreshToken,
@@ -176,30 +176,88 @@ export const handleRefreshToken = asyncHandler(
           user.refreshToken = [...newRTArray];
           await user.save();
         }
-
         if (decoded !== undefined) {
           if (err || user._id !== (decoded as any).id)
             return res.sendStatus(403);
         }
-
         // Refresh token was still valid
         const access_token = user.getAccessToken();
         const new_refresh_token = user.getRefreshToken();
-
         // Saving refreshToken with current user
         user.refreshToken = [...newRTArray, new_refresh_token];
         await user.save();
-
         // Creates Secure Cookie with refresh token
         res.cookie("jwt", new_refresh_token, {
           httpOnly: true,
-          // secure: true,
-          sameSite: "none",
+          secure: true,
+          sameSite: "None",
           maxAge: 24 * 60 * 60 * 1000,
         });
-
-        res.json({ access_token });
+        res.json({ accessToken: access_token });
       }
     );
   }
 );
+
+// @desc    Get current user
+// @route   GET /api/v1/auth/me
+// @access  Private
+export const getLoggedUser = asyncHandler(
+  async (req: any, res: any, next: NextFunction) => {
+    // console.log("Request get logged user:", req.cookies);
+    const refreshToken = req.cookies.jwt;
+
+    const currentUser:
+      | (UserT & {
+          _id: Types.ObjectId;
+        })
+      | null = await User.findOne({ refreshToken: refreshToken }).select([
+      "-password",
+      "-refreshToken",
+    ]);
+
+    if (!currentUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ success: true, user: currentUser });
+  }
+);
+
+// @desc    Logout user
+// @route   GET /api/v1/auth/logout
+// @access  Private
+export const handleLogout = async (req: any, res: any) => {
+  // On client, also delete the accessToken
+
+  const cookies = req.cookies;
+  if (!cookies?.jwt) return res.sendStatus(204); //No content
+  const refreshToken: string = cookies.jwt;
+
+  // Is refreshToken in db?
+  const user:
+    | (UserT & {
+        _id: Types.ObjectId;
+      })
+    | null = await User.findOne({ refreshToken }).exec();
+  if (!user) {
+    res.clearCookie("jwt", {
+      httpOnly: true,
+      sameSite: "None",
+      secure: true,
+    });
+    return res.sendStatus(204);
+  }
+
+  // Delete refreshToken in db
+  user.refreshToken = user.refreshToken.filter((rt) => rt !== refreshToken);
+  await user.save();
+  // console.log(result);
+
+  res.clearCookie("jwt", {
+    httpOnly: true,
+    sameSite: "None",
+    secure: true,
+  });
+  res.sendStatus(204);
+};
