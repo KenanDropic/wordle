@@ -1,19 +1,24 @@
 import jwt from "jsonwebtoken";
 import asyncHandler from "express-async-handler";
-import User from "../models/User.js";
-import { ErrorResponse } from "../utils/errResponse.js";
+import User from "../models/User";
+import { ErrorResponse } from "../utils/errResponse";
 import { NextFunction, Request, Response } from "express";
 
 export const authenticate = asyncHandler(
   async (req: any, res: Response, next: NextFunction) => {
-    let token;
+    let token: string | undefined;
+
+    // console.log("Request cookies: middleware", req.cookies);
 
     if (
       req.headers.authorization &&
       req.headers.authorization.startsWith("Bearer")
     ) {
       token = req.headers.authorization.split(" ")[1];
+    } else if (req.cookies.jwt) {
+      token = req.cookies.jwt;
     }
+
     if (!token) {
       return next(
         new ErrorResponse({
@@ -25,11 +30,18 @@ export const authenticate = asyncHandler(
 
     try {
       // verify token
-      const decoded = jwt.verify(token, `${process.env.ACCESS_TOKEN_SECRET}`);
+      const decoded: string | jwt.JwtPayload = jwt.verify(
+        token,
+        `${
+          req.headers.authorization
+            ? process.env.ACCESS_TOKEN_SECRET
+            : process.env.REFRESH_TOKEN_SECRET
+        }`
+      );
 
       (req as any).user = await User.findById((decoded as any).id);
       next();
-    } catch (error) {
+    } catch (error: any) {
       return next(
         new ErrorResponse({
           message: "Not authorized to access this route",
@@ -40,6 +52,7 @@ export const authenticate = asyncHandler(
   }
 );
 
+// role authorization,yet to implement
 export const authorize = (...roles: string[]) => {
   return (req: any, res: Response, next: NextFunction) => {
     if (!roles.includes(req.user.role)) {
