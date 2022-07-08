@@ -10,6 +10,7 @@ import {
   BaseQueryFn,
   QueryReturnValue,
 } from "@reduxjs/toolkit/dist/query/baseQueryTypes";
+import { useCookies } from "react-cookie";
 
 const mutex = new Mutex();
 
@@ -61,6 +62,7 @@ const baseQueryWithReauth = async (
           if (refreshResult.data) {
             const access_token: string = refreshResult?.data;
             api.dispatch(setCredentials(access_token));
+            localStorage.setItem("logged_in", "true");
             //retry original query with new access token
             result = await baseQuery(args, api, extraOptions);
           } else {

@@ -1,6 +1,7 @@
+import { useCookies } from "react-cookie";
 import { apiSlice } from "../app/api/apiSlice";
 import { Inputs } from "../components/Login";
-import { User } from "./authSlice";
+import { setUser, User } from "./authSlice";
 
 export interface UserPayload {
   success: boolean;
@@ -16,12 +17,15 @@ export const authApiSlice = apiSlice.injectEndpoints({
         body: { ...data },
         credentials: "include",
       }),
-      // async onQueryStarted(args, { dispatch, queryFulfilled }) {
-      //   try {
-      //     await queryFulfilled;
-      //     await dispatch(authApiSlice.endpoints.getMe.initiate({}));
-      //   } catch (error) {}
-      // },
+      async onQueryStarted(args, { dispatch, queryFulfilled }) {
+        try {
+          // console.log("LOGIN METHOD");
+          localStorage.setItem("logged_in", "true");
+          await queryFulfilled;
+          // const res = await dispatch(authApiSlice.endpoints.getMe.initiate({}));
+          // console.log(res);
+        } catch (error) {}
+      },
     }),
     getMe: builder.query<UserPayload, any>({
       query: (): string | object | any => ({
@@ -33,11 +37,19 @@ export const authApiSlice = apiSlice.injectEndpoints({
       //   try {
       //     const { data } = await queryFulfilled;
       //     console.log("OnQueryStarted:", data);
-      //     // dispatch(setUser(data));
+      //     dispatch(setUser(data.user));
       //   } catch (error) {}
       // },
+    }),
+    logoutUser: builder.mutation<void, void>({
+      query: (): string | object | any => ({
+        url: "/logout",
+        method: "GET",
+        credentials: "include",
+      }),
     }),
   }),
 });
 
-export const { useLoginMutation, useLazyGetMeQuery } = authApiSlice;
+export const { useLoginMutation, useLazyGetMeQuery, useLogoutUserMutation } =
+  authApiSlice;
