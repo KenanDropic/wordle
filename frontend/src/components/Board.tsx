@@ -1,18 +1,13 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Letter from "./Letter";
 import { boardDefault } from "./Words";
-import { useAppDispatch, useAppSelector } from "../features/hooks/hooks";
-import { getRandomWord, resetGame } from "../features/globalSlice";
-import { useLazyGetMeQuery } from "../features/authApiSlice";
-import { setUser } from "../features/authSlice";
+import { useAppSelector } from "../features/hooks/hooks";
 
 const Board: React.FC = () => {
-  const [getMe, { isLoading, error }] = useLazyGetMeQuery();
-  const dispatch = useAppDispatch();
   const {
     gameOver: { isOver },
+    displayRules,
   } = useAppSelector((state) => state.global);
-  const { user } = useAppSelector((state) => state.auth);
 
   const letterLength: number = boardDefault.length - 1;
   const letterArray: number[] = Array.from(
@@ -25,22 +20,6 @@ const Board: React.FC = () => {
     { length: boardLength },
     (_, i) => i + 1
   );
-
-  useEffect(() => {
-    dispatch(getRandomWord());
-  }, []);
-
-  const getCurrentUser: () => Promise<void> = async () => {
-    const { user } = await getMe(null).unwrap();
-    // console.log("Current user:", user);
-    dispatch(setUser(user));
-  };
-
-  useEffect(() => {
-    if (JSON.parse(localStorage.getItem("logged_in")!)) {
-      getCurrentUser();
-    }
-  }, []);
 
   return (
     <>

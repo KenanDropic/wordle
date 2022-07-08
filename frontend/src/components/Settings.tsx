@@ -1,9 +1,11 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { setTheme, showSettings } from "../features/globalSlice";
 import { useAppDispatch, useAppSelector } from "../features/hooks/hooks";
+import useLocalStorage from "../utils/useLocalStorage";
 
 const Settings: React.FC = () => {
-  const [isChecked, setIsChecked] = useState<boolean>(false);
+  const [themeLS, setThemeLS] = useLocalStorage("theme", "");
+  const [isChecked, setIsChecked] = useState<boolean>(themeLS ? true : false);
 
   const dispatch = useAppDispatch();
   const { lightTheme } = useAppSelector((state) => state.global);
