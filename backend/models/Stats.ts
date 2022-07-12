@@ -5,6 +5,7 @@ export interface StatsT extends Document {
   attempts: number;
   guessDistribution: object;
   numOfWins: number;
+  winRate: number;
   currentStreak: number;
   maxStreak: number;
 }
@@ -33,6 +34,10 @@ const StatsSchema: Schema = new Schema<StatsT>(
       type: Number,
       default: 0,
     },
+    winRate: {
+      type: Number,
+      default: 0,
+    },
     currentStreak: {
       type: Number,
       default: 0,
@@ -47,6 +52,16 @@ const StatsSchema: Schema = new Schema<StatsT>(
   }
 );
 
-// StatsSchema.pre("save", function () {});
+StatsSchema.post("findOneAndUpdate", async function () {
+  const docToUpdate = await this.model.findOne(this.getQuery());
+
+  if (docToUpdate.currentStreak > docToUpdate.maxStreak) {
+    docToUpdate.maxStreak = docToUpdate.currentStreak;
+  }
+
+  docToUpdate.winRate = (docToUpdate.numOfWins / docToUpdate.attempts) * 100;
+
+  await docToUpdate.save();
+});
 
 export default mongoose.model<StatsT>("Stats", StatsSchema);
