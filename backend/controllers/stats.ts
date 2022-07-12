@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import Stats from "../models/Stats";
-import User from "../models/User";
+import { Types } from "mongoose";
+import Stats, { StatsT } from "../models/Stats";
 
 export interface CustomRequest extends Request {}
 
@@ -21,9 +21,18 @@ export const getUserStats = async (
   res: Response,
   next: NextFunction
 ) => {
-  const reqs = req.body;
+  // exclude user and _id field from response
+  const userStats = await Stats.findOne({ user: (req as any).user._id }).select(
+    ["-user", "-_id"]
+  );
 
-  const userStats = await Stats.findById((req as any).user.id);
+  if (!userStats) {
+    return res
+      .status(404)
+      .json({ success: true, message: "User stats not found" });
+  }
+
+  return res.status(200).json({ success: true, data: userStats });
 };
 
 // @desc    Update User Stats
@@ -34,16 +43,13 @@ export const updateUserStats = async (
   res: Response,
   next: NextFunction
 ) => {
-  // increment attempt by one
-  // increment streak if won
-  // check if current streak is higher than max streak
-  // update guess distribution
-
   const { streak, guessedInAttempt, isWon } = req.body;
 
-  const userStats = await Stats.findOne({ user: (req as any).user._id });
-
-  console.log("UPDATE USERS STATS ENDPOINT".black.bold);
+  const userStats:
+    | (StatsT & {
+        _id: Types.ObjectId;
+      })
+    | null = await Stats.findOne({ user: (req as any).user._id });
 
   // const guessDistribution: GuessDist = {
   //   "1": 0,
@@ -54,7 +60,12 @@ export const updateUserStats = async (
   //   "6": 0,
   // };
 
-  if (userStats !== null) {
+  if (!userStats) {
+    return res.status(404).json({ message: "User stats not found" });
+  }
+
+  // increment position by one in which attempt you guessed the word
+  if (guessedInAttempt !== 0) {
     const positionToInc: number = parseInt(
       Object.keys(userStats.guessDistribution)[guessedInAttempt - 1]
     );
@@ -62,19 +73,17 @@ export const updateUserStats = async (
     (userStats.guessDistribution as any)[positionToInc] += 1;
   }
 
-  // check if won
+  // increment attempts by one
+  // increment numOfWins by one,if won
+  const updatedUserStats = await Stats.findOneAndUpdate(
+    { user: (req as any).user._id },
+    {
+      $inc: { attempts: 1, numOfWins: isWon ? 1 : 0 },
+      currentStreak: isWon ? streak : 0,
+      guessDistribution: userStats?.guessDistribution,
+    },
+    { new: true }
+  );
 
-  // const updatedUserStats = await Stats.findOneAndUpdate(
-  //   { user: (req as any).user._id },
-  //   {
-  //     $inc: { attempts: 1, numOfWins: 1 },
-  //     currentStreak: streak,
-  //     guessDistribution: userStats?.guessDistribution,
-  //   },
-  //   { new: true }
-  // );
-
-  console.log("Updated users stats:");
-
-  res.status(200).json({ success: true });
+  res.status(200).json({ success: true, updatedUserStats });
 };
