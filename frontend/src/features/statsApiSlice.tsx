@@ -1,4 +1,5 @@
 import { apiSlice } from "../app/api/apiSlice";
+import { StatsData } from "../components/Keyboard";
 
 export const statsApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -9,8 +10,8 @@ export const statsApiSlice = apiSlice.injectEndpoints({
         credentials: "include",
       }),
     }),
-    updateStats: builder.mutation<any, any>({
-      query: (data: {}): string | object | any => ({
+    updateStats: builder.mutation<any, StatsData>({
+      query: (data: StatsData): string | object | any => ({
         url: "/stats",
         method: "PUT",
         body: { ...data },

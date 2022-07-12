@@ -6,6 +6,8 @@ import {
   setLetterPosition,
 } from "../features/globalSlice";
 import { useAppDispatch, useAppSelector } from "../features/hooks/hooks";
+import { useUpdateStatsMutation } from "../features/statsApiSlice";
+import { StatsData, updateFN } from "./Keyboard";
 
 interface KeyValues {
   value: string;
@@ -16,17 +18,29 @@ interface KeyValues {
 type ClickFn = () => void;
 
 const Key: React.FC<KeyValues> = ({ value, bigKey, shouldDisable }) => {
+  let streak: number = localStorage.getItem("streak")
+    ? JSON.parse(localStorage.getItem("streak")!)
+    : 0;
   const dispatch = useAppDispatch();
   const {
     currentAttempt,
     words: { todaysWord, wordSet },
     board,
   } = useAppSelector((state) => state.global);
+  const [updateStats] = useUpdateStatsMutation();
+
+  let statsData: StatsData = {
+    streak,
+    guessedInAttempt: 0,
+    isWon: false,
+  };
+
+  const updateData: updateFN = async (data: StatsData) => {
+    await updateStats(data);
+  };
 
   const handleClick: ClickFn = () => {
     if (value === "ENTER") {
-      if (currentAttempt.letterPosition !== 5) return;
-
       if (currentAttempt.letterPosition !== 5) return;
       // form a word with entered letters
       let guessedWord: string = "";
@@ -37,22 +51,38 @@ const Key: React.FC<KeyValues> = ({ value, bigKey, shouldDisable }) => {
       // check if word we entered is inside words txt
       if (wordSet.has(`${guessedWord.toLowerCase()}\r`)) {
         dispatch(setAttempt());
+
+        // word guessed correct - end game
+        if (guessedWord.toLowerCase() === todaysWord) {
+          streak += 1;
+          localStorage.setItem("streak", JSON.stringify(streak));
+          statsData = {
+            streak,
+            guessedInAttempt: currentAttempt.attempt + 1,
+            isWon: true,
+          };
+          dispatch(setGameOver(true));
+          updateData(statsData);
+        }
+
+        // run out of attempts but didn't guessed word
+        if (
+          currentAttempt.attempt === 5 &&
+          guessedWord.toLowerCase() !== todaysWord &&
+          wordSet.has(`${guessedWord.toLowerCase()}\r`)
+        ) {
+          localStorage.setItem("streak", "0");
+          streak = 0;
+          statsData = {
+            streak,
+            guessedInAttempt: 0,
+            isWon: false,
+          };
+          dispatch(setGameOver(false));
+          updateData(statsData);
+        }
       } else {
         alert("Word Not Found");
-      }
-
-      // word guessed correct - end game
-      if (guessedWord.toLowerCase() === todaysWord) {
-        dispatch(setGameOver(true));
-      }
-
-      // run out of attempts but didn't guessed word
-      if (
-        currentAttempt.attempt === 5 &&
-        guessedWord.toLowerCase() !== todaysWord &&
-        wordSet.has(`${guessedWord.toLowerCase()}\r`)
-      ) {
-        dispatch(setGameOver(false));
       }
     } else if (value === "DELETE") {
       if (currentAttempt.letterPosition === 0) return;
