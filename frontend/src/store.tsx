@@ -2,6 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import { combineReducers } from "@reduxjs/toolkit";
 import globalReducer from "./features/globalSlice";
 import authReducer from "./features/authSlice";
+import statsReducer from "./features/statsSlice";
 import { apiSlice } from "./app/api/apiSlice";
 import { enableMapSet } from "immer";
 
@@ -12,6 +13,7 @@ export const store = configureStore({
   reducer: {
     global: globalReducer,
     auth: authReducer,
+    stats: statsReducer,
     [apiSlice.reducerPath]: apiSlice.reducer,
   },
   middleware: (getDefaultMiddleware) =>
@@ -21,6 +23,7 @@ export const store = configureStore({
         ignoredPaths: ["global.words.wordSet"],
       },
     }).concat(apiSlice.middleware),
+  // disable in production mode
   devTools: true,
 });
 
