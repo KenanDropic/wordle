@@ -1,29 +1,35 @@
 {
   "name": "wordle-ts",
   "private": true,
+  "proxy": "http://localhost:5000",
   "version": "0.0.0",
   "scripts": {
     "start": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "preinstall": "npm install --package-lock-only --ignore-scripts && npx npm-force-resolutions"
   },
   "dependencies": {
     "@hookform/resolvers": "^2.9.3",
     "@reduxjs/toolkit": "^1.8.2",
+    "async-mutex": "^0.3.2",
     "axios": "^0.27.2",
     "react": "^18.0.0",
+    "react-cookie": "^4.1.1",
     "react-dom": "^18.0.0",
     "react-hook-form": "^7.33.1",
     "react-redux": "^8.0.2",
-    "react-router-dom": "^6.3.0",
-    "yup": "^0.32.11"
+    "react-router-dom": "^6.3.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
-    "@types/yup": "^0.29.14",
     "@vitejs/plugin-react": "^1.3.0",
     "typescript": "^4.6.3",
     "vite": "^2.9.9"
+  },
+  "resolutions": {
+    "@types/react": "17.0.2",
+    "@types/react-dom": "17.0.2"
   }
 }
