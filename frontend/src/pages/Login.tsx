@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { useCookies } from "react-cookie";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavigateFunction, useNavigate } from "react-router-dom";
 import {
   useLazyGetMeQuery,
   useLoginMutation,
   useLogoutUserMutation,
 } from "../features/authApiSlice";
-import { logOut, setCredentials, setUser, User } from "../features/authSlice";
+import { logOut, setUser, User } from "../features/authSlice";
 import { useAppDispatch, useAppSelector } from "../features/hooks/hooks";
 import useLocalStorage from "../utils/useLocalStorage";
 import Logout from "./Logout";
@@ -21,37 +20,38 @@ export type Inputs = {
 
 const Login: React.FC = () => {
   const [showPwd, setShowPwd] = useState<boolean>(false);
+  const [logged, setLogged] = useLocalStorage("logged_in", "");
+  const [theme, seetTheme] = useLocalStorage("theme", "");
+
+  const effectRan = useRef<boolean>(false);
+
+  // use form hook
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<Inputs>({});
 
-  const [login, { error, isSuccess }] = useLoginMutation();
-  const [logoutUser] = useLogoutUserMutation();
-  const [getMe] = useLazyGetMeQuery();
-
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
   const { lightTheme } = useAppSelector((state) => state.global);
 
-  const navigate = useNavigate();
-  const [logged, setLogged] = useLocalStorage("logged_in", "");
-  const [theme, seetTheme] = useLocalStorage("theme", "");
+  const [login, { error, isSuccess }] = useLoginMutation();
+  const [logoutUser] = useLogoutUserMutation();
+  const [getMe] = useLazyGetMeQuery();
 
+  const navigate: NavigateFunction = useNavigate();
+
+  // get logged user
   const getCurrentUser: () => Promise<void> = async () => {
-    const { user } = await getMe(null).unwrap();
-    // console.log("Current user:", user);
-    dispatch(setUser(user));
+    await getMe(null).unwrap();
   };
 
   const onSubmit = async (data: Inputs) => {
-    const access_token = await login({
+    await login({
       email: data.email,
       password: data.password,
     }).unwrap();
-    // console.log("Data & access_token:", data, access_token);
-    dispatch(setCredentials(access_token));
   };
 
   useEffect(() => {
@@ -61,10 +61,14 @@ const Login: React.FC = () => {
   }, [isSuccess]);
 
   useEffect(() => {
-    if (logged) {
+    if (effectRan.current === false && logged) {
       getCurrentUser();
     }
-  }, [logged]);
+
+    return () => {
+      effectRan.current = true;
+    };
+  }, []);
 
   // add loader?!
   return (

@@ -8,7 +8,6 @@ const credentials = (req: Request, res: any, next: NextFunction) => {
       res.header("Access-Control-Allow-Credentials", true);
     }
   }
-  console.log("Origin:", origin);
   next();
 };
 

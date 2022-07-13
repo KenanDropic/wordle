@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Types } from "mongoose";
 
 export interface User {
@@ -23,29 +23,21 @@ const initialState: InitialState = {
     : null,
 };
 
-type recievedPayload = {
-  access_token: string | null;
-};
-
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
     setCredentials: (state, action: PayloadAction<any>) => {
-      // console.log("ACTION PAYLOAD:", action.payload);
-      // console.log("SET CREDENTIALS");
       state.access_token = action.payload.accessToken;
       localStorage.setItem("token", action.payload.accessToken);
     },
     logOut: (state) => {
+      // console.log("LOGOUT");
       state.user = null;
       state.access_token = null;
       localStorage.removeItem("token");
-      localStorage.removeItem("logged_in");
     },
     setUser: (state, action: PayloadAction<User>) => {
-      // console.log("User data:", action.payload);
-      // console.log("SET USER");
       state.user = action.payload;
     },
   },

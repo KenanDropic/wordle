@@ -10,16 +10,16 @@ import {
   BaseQueryFn,
   QueryReturnValue,
 } from "@reduxjs/toolkit/dist/query/baseQueryTypes";
-import { useCookies } from "react-cookie";
 
 const mutex = new Mutex();
 
 const baseQuery: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> =
   fetchBaseQuery({
-    baseUrl: "http://127.0.0.1:5000/api/v1/auth",
+    baseUrl: "http://127.0.0.1:5000/api/v1",
     credentials: "include",
     prepareHeaders: (headers, { getState }) => {
       const accessToken: string = (getState() as any).auth.access_token;
+      // console.log("Access token prepare headers:", accessToken);
       // console.log("Get state:", getState() as any);
       // console.log("Access token", accessToken);
       if (accessToken) {
@@ -42,22 +42,22 @@ const baseQueryWithReauth = async (
 
   let result: QueryReturnValue<unknown, FetchBaseQueryError, {}> =
     await baseQuery(args, api, extraOptions);
-  // console.log("Result:", result);
+  // console.log("Result of reauth:", result);
 
   if (result.error) {
-    if ((result?.error as any).originalStatus === 401) {
+    if (
+      (result.error as any).originalStatus === 401 ||
+      result.error.status === 401
+    ) {
+      localStorage.setItem("logged_in", "false");
       if (!mutex.isLocked()) {
         const release: MutexInterface.Releaser = await mutex.acquire();
 
         try {
           console.log("sending refresh token ");
           const refreshResult: QueryReturnValue<any, FetchBaseQueryError, {}> =
-            await baseQuery(
-              { credentials: "include", url: "/token" },
-              api,
-              extraOptions
-            );
-          console.log("Refresh result:", refreshResult.data);
+            await baseQuery("/auth/token", api, extraOptions);
+          // console.log("Refresh result data:", refreshResult);
 
           if (refreshResult.data) {
             const access_token: string = refreshResult?.data;
@@ -67,6 +67,7 @@ const baseQueryWithReauth = async (
             result = await baseQuery(args, api, extraOptions);
           } else {
             api.dispatch(logOut());
+            localStorage.setItem("logged_in", "false");
             // window.location.href = "/login";
           }
         } finally {
@@ -74,11 +75,11 @@ const baseQueryWithReauth = async (
           release();
         }
       }
+    } else {
+      // wait until the mutex is avaliable without locking it
+      await mutex.waitForUnlock();
+      result = await baseQuery(args, api, extraOptions);
     }
-  } else {
-    // wait until the mutex is avaliable without locking it
-    await mutex.waitForUnlock();
-    result = await baseQuery(args, api, extraOptions);
   }
 
   return result;
@@ -87,5 +88,5 @@ const baseQueryWithReauth = async (
 export const apiSlice = createApi({
   reducerPath: "authApi",
   baseQuery: baseQueryWithReauth,
-  endpoints: (builder) => ({}),
+  endpoints: () => ({}),
 });

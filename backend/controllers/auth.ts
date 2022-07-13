@@ -1,8 +1,9 @@
 import jwt from "jsonwebtoken";
 import User, { UserT } from "../models/User";
 import asyncHandler from "express-async-handler";
-import { NextFunction, Request, RequestHandler, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { Types } from "mongoose";
+import Stats, { StatsT } from "../models/Stats";
 
 type asyncHandlerTs = (
   req: Request,
@@ -15,41 +16,54 @@ export interface CustomRequest extends Request {}
 // @desc    Register User
 // @route   POST /api/v1/auth/register
 // @access  Public
-export const register = asyncHandler(
-  async (req: any, res: any, next: NextFunction) => {
-    if (!req.body?.username || !req.body?.password || !req.body?.email) {
-      return res.status(404).json({ message: "Provide all values" });
-    }
-    const { username, email, password } = req.body;
-
-    // check for duplicate usernames in the db
-    const duplicate:
-      | (UserT & {
-          _id: Types.ObjectId;
-        })
-      | null = await User.findOne({ email });
-
-    if (duplicate) {
-      return res.status(400).json({ message: "User already exists" });
-    }
-
-    const user: UserT & {
-      _id: Types.ObjectId;
-    } = new User(req.body);
-
-    const access_token: string = user.getAccessToken();
-    // const refresh_token: string = user.getRefreshToken();
-
-    await user.save();
-
-    res.status(201).json({ success: true, access_token });
+export const register = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  if (!req.body?.username || !req.body?.password || !req.body?.email) {
+    return res.status(404).json({ message: "Provide all values" });
   }
-);
+  const { username, email, password } = req.body;
+
+  // check for duplicate usernames in the db
+  const duplicate:
+    | (UserT & {
+        _id: Types.ObjectId;
+      })
+    | null = await User.findOne({ email });
+
+  if (duplicate) {
+    return res.status(400).json({ message: "User already exists" });
+  }
+
+  const user: UserT & {
+    _id: Types.ObjectId;
+  } = new User(req.body);
+
+  const stats: StatsT & {
+    _id: Types.ObjectId;
+  } = new Stats({
+    user,
+  });
+
+  const access_token: string = user.getAccessToken();
+  // const refresh_token: string = user.getRefreshToken();
+
+  await user.save();
+  await stats.save();
+
+  return res.status(201).json({ success: true, access_token });
+};
 
 // @desc    Login User
 // @route   POST /api/v1/auth/login
 // @access  Public
-export const login = asyncHandler(async (req: any, res: any) => {
+export const login = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const cookies = req.cookies;
   const { email, password } = req.body;
 
@@ -96,7 +110,7 @@ export const login = asyncHandler(async (req: any, res: any) => {
 
     res.clearCookie("jwt", {
       httpOnly: true,
-      sameSite: "None",
+      sameSite: "none",
       secure: true,
     });
   }
@@ -108,62 +122,42 @@ export const login = asyncHandler(async (req: any, res: any) => {
   res.cookie("jwt", refresh_token, {
     httpOnly: true,
     secure: true,
-    sameSite: "None",
-    maxAge: 24 * 60 * 60 * 1000,
+    sameSite: "none",
+    maxAge: 60 * 60 * 1000,
   });
 
   // Send access token & refresh token to user
-  res.json({
+  return res.json({
     accessToken: access_token,
   });
-});
+};
 
 // @desc    Get new refresh token
 // @route   GET /api/v1/auth/token
 // @access  Private
-export const handleRefreshToken = asyncHandler(
-  async (req: any, res: any, next: NextFunction) => {
-    const cookies = req.cookies;
-    if (!cookies?.jwt) return res.sendStatus(401);
-    const refreshToken: string = cookies.jwt;
-    res.clearCookie("jwt", {
-      httpOnly: true,
-      sameSite: "None",
-      secure: true,
-    });
-    const user:
-      | (UserT & {
-          _id: Types.ObjectId;
-        })
-      | null = await User.findOne({ refreshToken }).exec();
-    if (!user) {
-      jwt.verify(
-        refreshToken,
-        `${process.env.REFRESH_TOKEN_SECRET}`,
-        async (
-          err: jwt.VerifyErrors | null,
-          decoded: string | jwt.JwtPayload | undefined
-        ) => {
-          if (err) return res.sendStatus(403); //Forbidden
-          let hackedUser:
-            | (UserT & {
-                _id: Types.ObjectId;
-              })
-            | null;
-          // Delete refresh tokens of hacked user
-          if (decoded !== undefined) {
-            hackedUser = await User.findOne((decoded as any).id);
-            if (hackedUser !== null) {
-              hackedUser.refreshToken = [];
-              await hackedUser.save();
-            }
-          }
-        }
-      );
-      return res.sendStatus(403); //Forbidden
-    }
-    const newRTArray = user.refreshToken.filter((rt) => rt !== refreshToken);
-    // evaluate jwt
+export const handleRefreshToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const cookies = req.cookies;
+  if (!cookies?.jwt) return res.sendStatus(401);
+  const refreshToken: string = cookies.jwt;
+  res.clearCookie("jwt", {
+    httpOnly: true,
+    sameSite: "none",
+    secure: true,
+  });
+
+  const user:
+    | (UserT & {
+        _id: Types.ObjectId;
+      })
+    | null = await User.findOne({ refreshToken }).exec();
+
+  // console.log("FOUND USER", user);
+
+  if (!user) {
     jwt.verify(
       refreshToken,
       `${process.env.REFRESH_TOKEN_SECRET}`,
@@ -171,33 +165,64 @@ export const handleRefreshToken = asyncHandler(
         err: jwt.VerifyErrors | null,
         decoded: string | jwt.JwtPayload | undefined
       ) => {
-        if (err) {
-          // expired refresh token
-          user.refreshToken = [...newRTArray];
-          await user.save();
-        }
+        if (err) return res.sendStatus(403); //Forbidden
+        let hackedUser:
+          | (UserT & {
+              _id: Types.ObjectId;
+            })
+          | null;
+        // Delete refresh tokens of hacked user
         if (decoded !== undefined) {
-          if (err || user._id !== (decoded as any).id)
-            return res.sendStatus(403);
+          hackedUser = await User.findOne((decoded as any).id);
+          if (hackedUser !== null) {
+            hackedUser.refreshToken = [];
+            await hackedUser.save();
+          }
         }
-        // Refresh token was still valid
-        const access_token = user.getAccessToken();
-        const new_refresh_token = user.getRefreshToken();
-        // Saving refreshToken with current user
-        user.refreshToken = [...newRTArray, new_refresh_token];
-        await user.save();
-        // Creates Secure Cookie with refresh token
-        res.cookie("jwt", new_refresh_token, {
-          httpOnly: true,
-          secure: true,
-          sameSite: "None",
-          maxAge: 24 * 60 * 60 * 1000,
-        });
-        res.json({ accessToken: access_token });
       }
     );
+    // console.log("FORBIDEEEEN");
+    return res.sendStatus(403); //Forbidden
   }
-);
+  const newRTArray = user.refreshToken.filter((rt) => rt !== refreshToken);
+
+  // console.log("New refresh token array:", newRTArray);
+
+  // evaluate jwt
+  jwt.verify(
+    refreshToken,
+    `${process.env.REFRESH_TOKEN_SECRET}`,
+    async (
+      err: jwt.VerifyErrors | null,
+      decoded: string | jwt.JwtPayload | undefined
+    ) => {
+      if (err) {
+        // expired refresh token
+        user.refreshToken = [...newRTArray];
+        await user.save();
+      }
+      if (decoded !== undefined) {
+        if (user._id != (decoded as any).id) return res.sendStatus(403);
+        // console.log("Decoded", decoded);
+      }
+      // Refresh token was still valid
+      const access_token = user.getAccessToken();
+      const new_refresh_token = user.getRefreshToken();
+      // Saving refreshToken with current user
+      user.refreshToken = [...newRTArray, new_refresh_token];
+      await user.save();
+      // Creates Secure Cookie with refresh token
+      res.cookie("jwt", new_refresh_token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        maxAge: 60 * 60 * 1000,
+      });
+
+      res.json({ accessToken: access_token });
+    }
+  );
+};
 
 // @desc    Get current user
 // @route   GET /api/v1/auth/me
@@ -220,7 +245,7 @@ export const getLoggedUser = asyncHandler(
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.status(200).json({ success: true, user: currentUser });
+    return res.status(200).json({ success: true, user: currentUser });
   }
 );
 

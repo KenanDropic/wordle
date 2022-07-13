@@ -8,17 +8,17 @@ export const authenticate = asyncHandler(
   async (req: any, res: Response, next: NextFunction) => {
     let token: string | undefined;
 
+    console.log("Trigger AUTH middleware".green.bold);
+
     // console.log("Request cookies: middleware", req.cookies);
 
-    if (
-      req.headers.authorization &&
-      req.headers.authorization.startsWith("Bearer")
-    ) {
-      token = req.headers.authorization.split(" ")[1];
+    let authHeader = req.headers.authorization;
+
+    if (authHeader && authHeader.startsWith("Bearer")) {
+      token = authHeader.split(" ")[1];
     } else if (req.cookies.jwt) {
       token = req.cookies.jwt;
     }
-
     if (!token) {
       return next(
         new ErrorResponse({
@@ -33,7 +33,7 @@ export const authenticate = asyncHandler(
       const decoded: string | jwt.JwtPayload = jwt.verify(
         token,
         `${
-          req.headers.authorization
+          authHeader
             ? process.env.ACCESS_TOKEN_SECRET
             : process.env.REFRESH_TOKEN_SECRET
         }`
