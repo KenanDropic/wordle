@@ -10,6 +10,7 @@ export const statsApiSlice = apiSlice.injectEndpoints({
         method: "GET",
         credentials: "include",
       }),
+      providesTags: ["Stats"],
       async onQueryStarted(args, { dispatch, queryFulfilled }) {
         try {
           const { data: stats } = await queryFulfilled;
@@ -25,6 +26,7 @@ export const statsApiSlice = apiSlice.injectEndpoints({
         body: { ...data },
         credentials: "include",
       }),
+      invalidatesTags: ["Stats"],
     }),
   }),
 });

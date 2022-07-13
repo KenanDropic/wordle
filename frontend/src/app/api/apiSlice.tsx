@@ -67,7 +67,7 @@ const baseQueryWithReauth = async (
             result = await baseQuery(args, api, extraOptions);
           } else {
             api.dispatch(logOut());
-            localStorage.setItem("logged_in", "false");
+            // localStorage.setItem("logged_in", "false");
             // window.location.href = "/login";
           }
         } finally {
@@ -89,4 +89,5 @@ export const apiSlice = createApi({
   reducerPath: "authApi",
   baseQuery: baseQueryWithReauth,
   endpoints: () => ({}),
+  tagTypes: ["Stats"],
 });
