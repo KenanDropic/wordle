@@ -1,6 +1,7 @@
 import { apiSlice } from "../app/api/apiSlice";
 import { Inputs } from "../pages/Login";
 import { setCredentials, setUser, User } from "./authSlice";
+import { RegisterInputs } from "../pages/Register";
 
 export interface UserPayload {
   success: boolean;
@@ -25,6 +26,19 @@ export const authApiSlice = apiSlice.injectEndpoints({
         } catch (error) {}
       },
     }),
+    registerUser: builder.mutation<any, RegisterInputs>({
+      query: (data: RegisterInputs): string | object | any => ({
+        url: "/auth/register",
+        method: "POST",
+        body: { ...data },
+      }),
+      async onQueryStarted(args, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          console.log(data);
+        } catch (error) {}
+      },
+    }),
     getMe: builder.query<UserPayload, any>({
       query: (): string | object | any => ({
         url: "/auth/me",
@@ -40,7 +54,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
     }),
     logoutUser: builder.mutation<void, void>({
       query: (): string | object | any => ({
-        url: "/logout",
+        url: "/auth/logout",
         method: "GET",
         credentials: "include",
       }),
@@ -50,6 +64,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
 
 export const {
   useLoginMutation,
+  useRegisterUserMutation,
   useLazyGetMeQuery,
   useGetMeQuery,
   useLogoutUserMutation,
