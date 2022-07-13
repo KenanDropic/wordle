@@ -640,6 +640,10 @@ input:checked + .slider:before {
   .fa-delete-left{
     font-size: 24px;
   }
+  .stats-container{
+    max-width: 440px;
+    height: 40%;
+  }
 }
 @media (max-width: 500px) {
   .board {
@@ -655,10 +659,18 @@ input:checked + .slider:before {
   .fa-delete-left{
     font-size: 20px;
   }
+  .stats-container{
+    max-width: 350px;
+    height: 40%;
+  }
 }
 @media (max-width: 400px) {
   .board {
     width: 90%;
     height:45%;
+  }
+  .stats-container{
+    max-width: 300px;
+    height: 40%;
   }
 }

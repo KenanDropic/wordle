@@ -27,6 +27,10 @@ interface InitialState {
   words: Words;
   disabledLetters: string[];
   gameOver: GameOver;
+  displayRules: boolean;
+  displaySettings: boolean;
+  lightTheme: boolean;
+  displayStats: boolean;
 }
 
 const initialState: InitialState = {
@@ -51,6 +55,13 @@ const initialState: InitialState = {
     isOver: false,
     isWon: false,
   },
+  displayRules: false,
+  displaySettings: false,
+  lightTheme:
+    JSON.parse(localStorage.getItem("theme")!) !== ""
+      ? JSON.parse(localStorage.getItem("theme")!)
+      : false,
+  displayStats: false,
 };
 
 export const getRandomWord: AsyncThunk<
@@ -108,6 +119,22 @@ const globalSlice = createSlice({
       state.gameOver.isOver = true;
       state.gameOver.isWon = action.payload;
     },
+    showRules: (state) => {
+      state.displayRules = !state.displayRules;
+    },
+    showSettings: (state) => {
+      state.displaySettings = !state.displaySettings;
+    },
+    showStats: (state) => {
+      state.displayStats = !state.displayStats;
+    },
+    setTheme: (state) => {
+      state.lightTheme = !state.lightTheme;
+      localStorage.setItem("theme", state.lightTheme ? "true" : "false");
+    },
+    resetGame: (state) => {
+      return initialState;
+    },
   },
   extraReducers(builder) {
     builder.addCase(getRandomWord.fulfilled, (state, action) => {
@@ -128,6 +155,11 @@ export const {
   setAttempt,
   setDisabledLettersArray,
   setGameOver,
+  resetGame,
+  showRules,
+  showSettings,
+  showStats,
+  setTheme,
 } = globalSlice.actions;
 
 export default globalSlice.reducer;

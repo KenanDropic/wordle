@@ -1,11 +1,10 @@
 import React from "react";
-import { useDispatch } from "react-redux";
 import { showRules } from "../features/globalSlice";
 import { useAppDispatch, useAppSelector } from "../features/hooks/hooks";
 
 const Rules: React.FC = () => {
-  const dispatch = useDispatch();
-  const { displayRules, lightTheme } = useAppSelector((state) => state.global);
+  const dispatch = useAppDispatch();
+  const { lightTheme } = useAppSelector((state) => state.global);
   return (
     <div
       className={`main-container ${!lightTheme ? "dark-mode" : "light-mode"} `}

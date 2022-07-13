@@ -34,7 +34,9 @@ const Stats: React.FC = () => {
             <small>Played</small>
           </div>
           <div>
-            <h1>{stats.winRate.toFixed(2)}</h1>
+            <h1>
+              {stats.winRate > 0 ? stats.winRate.toFixed(2) : stats.winRate}
+            </h1>
             <small>Win %</small>
           </div>
           <div>

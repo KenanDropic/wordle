@@ -4,39 +4,38 @@ import Nav from "../components/Nav";
 import Rules from "../components/Rules";
 import Settings from "../components/Settings";
 import { useAppDispatch, useAppSelector } from "../features/hooks/hooks";
-import { NavigateFunction, useNavigate } from "react-router-dom";
 import { useLazyGetMeQuery } from "../features/authApiSlice";
-import { setUser } from "../features/authSlice";
-
 import useLocalStorage from "../utils/useLocalStorage";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { getRandomWord } from "../features/globalSlice";
+import Stats from "../components/Stats";
 
 const Home: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const { displayRules, displaySettings, lightTheme } = useAppSelector(
-    (state) => state.global
-  );
-
   const [logged, setLogged] = useLocalStorage("logged_in", "");
-  const [getMe, { isLoading, error }] = useLazyGetMeQuery();
+  const effectRan = useRef<boolean>(false);
 
-  const navigate: NavigateFunction = useNavigate();
+  const dispatch = useAppDispatch();
+  const { displayRules, displaySettings, displayStats, lightTheme } =
+    useAppSelector((state) => state.global);
+
+  const [getMe, { error }] = useLazyGetMeQuery();
 
   useEffect(() => {
     dispatch(getRandomWord());
   }, []);
 
   const getCurrentUser: () => Promise<void> = async () => {
-    const { user } = await getMe(null).unwrap();
-    // console.log("Current user:", user);
-    dispatch(setUser(user));
+    await getMe(null).unwrap();
   };
 
   useEffect(() => {
-    if (logged) {
+    if (effectRan.current === false && logged) {
       getCurrentUser();
     }
+
+    return () => {
+      effectRan.current = true;
+    };
   }, []);
 
   return displayRules ? (
@@ -45,13 +44,18 @@ const Home: React.FC = () => {
     <Settings />
   ) : (
     <>
-      <div className={`App ${!lightTheme ? "dark-mode" : "light-mode"}`}>
+      <div
+        className={`App ${!lightTheme ? "dark-mode" : "light-mode"} ${
+          displayStats ? "blur" : ""
+        }`}
+      >
         <Nav />
         <div className="game">
           <Board />
           <Keyboard />
         </div>
       </div>
+      {logged && <Stats />}
     </>
   );
 };
