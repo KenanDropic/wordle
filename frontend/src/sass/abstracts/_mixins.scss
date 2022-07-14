@@ -1,0 +1,40 @@
+@mixin theme($bg-col, $col) {
+  background-color: $bg-col;
+  color: $col;
+}
+@mixin borderInfo($borderPx, $borderColor) {
+  border: $borderPx solid $borderColor;
+}
+@mixin bgColor($bgCol) {
+  background-color: $bgCol;
+}
+@mixin lineSettings {
+  flex: 33%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin: 5px;
+}
+@mixin headerSettings {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 20px;
+}
+@mixin flexSettings($dspl, $flx-dir: "", $alg-items: "", $jst-content: "") {
+  display: $dspl;
+  flex-direction: $flx-dir;
+  align-items: unquote($alg-items);
+  justify-content: unquote($jst-content);
+}
+@mixin letter-key($dspl, $place-itms, $fnt-size) {
+  display: $dspl;
+  place-items: $place-itms;
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 5px;
+  font-size: $fnt-size * 1px;
+}
+@mixin statsContainerResponsive($mx-w, $h){
+  max-width: $mx-w * 1px;
+  height: $h * 1%;
+}

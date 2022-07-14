@@ -1,0 +1,107 @@
+@use "../abstracts/variables" as *;
+@use "../abstracts/mixins" as *;
+
+.game {
+  width: 100vw;
+  height: calc(100vh - 170px);
+  @include flexSettings(flex, column, center, "");
+  padding-top: 50px;
+}
+
+.board {
+  width: 22%;
+  height: 55%;
+  @include flexSettings(flex, column, "", "");
+}
+.row {
+  flex: 33%;
+  @include flexSettings(flex, row, "", "");
+  margin: 5px;
+  padding: 0px;
+
+  &:nth-of-type(1) {
+    margin-top: 0px;
+  }
+
+  &:nth-of-type(6) {
+    margin-bottom: 15px;
+  }
+}
+
+.letter {
+  flex: 33%;
+  height: 100%;
+  @include letter-key(grid, center, 30);
+  font-weight: bolder;
+}
+.flip {
+  animation: 0.5s linear flipping;
+}
+
+@keyframes flipping {
+  0% {
+    transform: rotateX(0deg);
+  }
+  50% {
+    transform: rotateX(90deg);
+  }
+  100% {
+    transform: rotateX(0deg);
+  }
+}
+
+.fa-arrows-rotate {
+  font-size: 30px;
+  cursor: pointer;
+  position: absolute;
+  left: 5%;
+  top: 9%;
+  transform: translateX(-250%);
+
+  &.active {
+    transform: translateX(0%);
+    transition: transform 0.5s ease-in;
+  }
+}
+#correct {
+  @include bgColor($correct);
+}
+
+#almost {
+  @include bgColor($almost);
+}
+
+#error {
+  @include bgColor($wrong);
+}
+
+.keyboard {
+  width: 75%;
+  height: 36%;
+  margin-top: 60px;
+}
+
+.line1,
+.line2,
+.line3 {
+  @include lineSettings();
+}
+
+.key {
+  width: 40px;
+  height: 60px;
+  border-radius: 4px;
+  @include letter-key(grid, center, 20);
+  background-color: $light-border;
+  cursor: pointer;
+}
+.fa-delete-left {
+  font-size: 28px;
+}
+
+#big {
+  width: 95px;
+}
+#disabled {
+  background-color: $wrong;
+}

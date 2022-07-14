@@ -1,0 +1,81 @@
+@use "../abstracts/variables" as *;
+@use "../abstracts/mixins" as *;
+
+.stats-container.active {
+  top: 50%;
+  transition: all 0.3s ease-in-out;
+  opacity: 1;
+  z-index: 1000;
+  padding: 20px;
+  @include flexSettings(flex, column, "", "");
+  box-shadow: 0 4px 23px 0 rgb(0 0 0 / 20%);
+  border-radius: 8px;
+  border: 1px solid $modal-dark-border-color;
+}
+
+.stats-container {
+  width: 500px;
+  max-width: 500px;
+  height: 45%;
+  position: absolute;
+  top: 80%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  opacity: 0;
+  transition: all 0.3s ease-in-out;
+}
+.stats-content {
+  @include flexSettings(flex, column, "");
+  text-align: center;
+
+  h3 {
+    margin-bottom: 25px;
+  }
+}
+.user-stats {
+  @include flexSettings(flex, column, "", space-around);
+  text-align: center;
+}
+.guess-distribution {
+  margin-top: 20px;
+  text-align: center;
+  width: 100%;
+}
+.gt-dt-div {
+  height: 24px;
+  width: 100%;
+  @include flexSettings(flex, row, "", "");
+  padding-bottom: 4px;
+  font-size: 14px;
+  line-height: 20px;
+}
+.gt-dt-div-num {
+  font-weight: bold;
+  font-size: 12px;
+  line-height: 18px;
+  letter-spacing: 0.1em;
+}
+.gt-dt-div-stats {
+  width: 100%;
+  height: 100%;
+  padding-left: 4px;
+}
+.gt-dt-div-stats-inner {
+  height: 100%;
+  position: relative;
+  background-color: $wrong;
+  @include flexSettings(flex, row, center, center);
+  width: 7%;
+}
+.gt-dt-div-stats-inner.guessed {
+  justify-content: flex-end;
+  background-color: $correct;
+  width: 50%;
+  padding-right: 10px;
+}
+.gt-dt-div-stats-content {
+  font-weight: bold;
+  font-size: 12px;
+  line-height: 18px;
+}

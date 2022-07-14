@@ -1,0 +1,37 @@
+@use "../abstracts/variables" as *;
+@use "../abstracts/mixins" as *;
+
+.dark-mode {
+  @include theme($dark-bg-color, $light-color);
+}
+.light-mode {
+  @include theme($light-bg-color, $dark-color);
+}
+.dark-mode {
+  .board,
+  .letter {
+    @include borderInfo(1px, $light-border);
+  }
+  .form {
+    @include bgColor($wrong);
+  }
+
+  .stats-container {
+    background-color: $modal-dark-bg-color;
+  }
+
+  .rules {
+    div {
+      @include borderInfo(2px, $light-border);
+    }
+  }
+}
+.light-mode {
+  .board,
+  .letter {
+    @include borderInfo(1px, $dark-border);
+  }
+  .form {
+    @include bgColor(#ccc);
+  }
+}

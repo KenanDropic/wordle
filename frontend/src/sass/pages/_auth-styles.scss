@@ -1,0 +1,155 @@
+@use "../abstracts/variables" as *;
+@use "../abstracts/mixins" as *;
+
+.error {
+  font-size: 13px;
+  font-weight: 700;
+  color: #d65a5a;
+}
+.container {
+  height: 100vh;
+  width: 100%;
+  @include flexSettings(flex, row, center, center);
+  background-color: transparent;
+  column-gap: 30px;
+  font-family: "Poppins", sans-serif;
+}
+.form {
+  position: absolute;
+  max-width: 430px;
+  width: 100%;
+  padding: 30px;
+  border-radius: 6px;
+  margin-top: 30px;
+
+  .field {
+    position: relative;
+    height: 50px;
+    width: 100%;
+    margin-top: 20px;
+    border-radius: 6px;
+
+    input,
+    button {
+      height: 100%;
+      width: 100%;
+      border: none;
+      font-size: 16px;
+      font-weight: 400;
+      border-radius: 6px;
+
+      &:focus {
+        border-bottom-width: 2px;
+      }
+    }
+
+    input {
+      outline: none;
+      padding: 0 35px;
+      border: 1px solid#CACACA;
+    }
+  }
+}
+.field button {
+  background-color: #999;
+  transition: all 0.3s ease;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $light-border;
+  }
+}
+
+header {
+  font-size: 28px;
+  font-weight: 600;
+  text-align: center;
+  transition: transform 0.3s ease-in-out;
+}
+header {
+  &:hover {
+    transform: scale(1.2);
+    transition: transform 0.3s ease-in-out;
+    cursor: pointer;
+  }
+}
+
+.toggle-password {
+  position: relative;
+  display: flex;
+
+  input {
+    position: absolute;
+    z-index: 2;
+  }
+
+  i {
+    position: absolute;
+    top: 50%;
+    right: 1%;
+    transform: translateY(-50%);
+    font-size: 20px;
+    z-index: 3;
+    padding: 0px 5px;
+    cursor: pointer;
+    color: #252424;
+  }
+
+  .fa-lock {
+    left: 1%;
+    width: 5%;
+    cursor: default;
+  }
+}
+
+.fa-envelope,
+.fa-user {
+  position: absolute;
+  top: 50%;
+  left: 1%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  padding: 0px 5px;
+  color: #252424;
+}
+
+.form-link {
+  text-align: center;
+  margin-top: 10px;
+
+  span,
+  a {
+    font-size: 14px;
+    font-weight: 400;
+  }
+}
+
+.form {
+  a {
+    color: $link-color;
+    font-weight: 700;
+    text-decoration: none;
+  }
+}
+.form-content {
+  a:hover {
+    text-decoration: underline;
+  }
+}
+@media screen and (max-width: 400px) {
+  .form {
+    padding: 20px 10px;
+  }
+}
+.logout-container {
+  @include flexSettings(flex, column, center, "");
+
+  button {
+    padding: 10px 25px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+}
+.logout-container > div {
+  margin: 20px 0px;
+}

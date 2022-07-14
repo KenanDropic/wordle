@@ -1,0 +1,69 @@
+@use "../abstracts/variables" as *;
+@use "../abstracts/mixins" as *;
+
+.main-container {
+  font-family: Arial, Helvetica, sans-serif;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1000;
+  padding: 100px 100px;
+}
+
+.rules-container,
+.settings-container {
+  display: flex;
+  flex-direction: column;
+  animation: slideIN 0.3s;
+}
+.rules-container.closed {
+  animation: slideOUT 0.3s ease-out;
+}
+@keyframes slideIN {
+  from {
+    transform: translateY(50%);
+  }
+  to {
+    transform: translateY(0%);
+  }
+}
+@keyframes slideOUT {
+  from {
+    transform: translateY(0%);
+  }
+  to {
+    transform: translateY(80%);
+  }
+}
+.rules-header,
+.settings-header,
+.stats-header {
+  @include headerSettings;
+}
+
+span {
+  margin: 15px 0px;
+}
+
+.rules {
+  display: flex;
+  width: 280px;
+}
+.rules {
+  div {
+    margin: 0px 5px;
+    border: 1px solid black;
+    padding: 10px 15px;
+    font-weight: 600;
+    width: 20%;
+    text-align: center;
+  }
+}
+.correct,
+.wrong,
+.almost {
+  color: #fff;
+}
+.correct {
+  margin-left: 0px !important;
+  padding: 0px;
+}

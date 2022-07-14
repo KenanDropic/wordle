@@ -1,0 +1,116 @@
+/* Table of contents
+----------------------------
+-- component imports
+-- layout imports
+-- pages imports
+*/
+
+/* components imports */
+@use "./components/game-styles";
+@use "./components/rules-styles";
+@use "./components/settings-styles";
+@use "./components/stats-styles";
+
+/* layout imports */
+@use "./layout/nav-styles";
+@use "./layout/light-dark-mode";
+
+/* pages imports */
+@use "./pages/auth-styles";
+
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  padding: 0%;
+  margin: 0;
+  overflow: hidden;
+}
+
+.App {
+  text-align: center;
+  width: 100vw;
+  height: 100vh;
+}
+.App {
+  .blur:not(#stats) {
+    filter: blur(1px);
+  }
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 1600px) {
+  .board {
+    width: 28%;
+  }
+}
+@media (max-width: 1350px) {
+  .board {
+    width: 36%;
+  }
+}
+@media (max-width: 1000px) {
+  .board {
+    width: 50%;
+  }
+  .keyboard {
+    width: 95%;
+  }
+}
+@media (max-width: 700px) {
+  .board {
+    width: 65%;
+  }
+  .keyboard {
+    width: 95%;
+  }
+  .key {
+    width: 35px;
+    height: 55px;
+  }
+  #big {
+    width: 80px;
+    font-size: 18px;
+  }
+  .fa-delete-left {
+    font-size: 24px;
+  }
+  .stats-container {
+    max-width: 440px;
+    height: 40%;
+  }
+}
+@media (max-width: 500px) {
+  .board {
+    width: 80%;
+  }
+  .key {
+    margin: 3px;
+  }
+  #big {
+    width: 60px;
+    font-size: 14px;
+  }
+  .fa-delete-left {
+    font-size: 20px;
+  }
+  .stats-container {
+    max-width: 350px;
+    height: 40%;
+  }
+}
+@media (max-width: 400px) {
+  .board {
+    width: 90%;
+    height: 45%;
+  }
+  .stats-container {
+    max-width: 300px;
+    height: 40%;
+  }
+}
