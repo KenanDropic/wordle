@@ -35,7 +35,9 @@ app.use("/api/v1/stats", stats);
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "/frontend/dist")));
 
-  app.get("*", (req, res) => res.sendFile(path.resolve("frontend", "dist")));
+  app.get("*", (req, res) =>
+    res.sendFile(path.resolve("frontend", "dist", "index.html"))
+  );
 } else {
   app.get("/", (req: Request, res: any) => {
     res.send("API is running...");
