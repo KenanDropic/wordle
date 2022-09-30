@@ -1,16 +1,11 @@
 import { apiSlice } from "../app/api/apiSlice";
-import { Inputs } from "../pages/Login";
-import { setCredentials, setUser, User } from "./authSlice";
-import { RegisterInputs } from "../pages/Register";
-
-export interface UserPayload {
-  success: boolean;
-  user: User;
-}
+import { setCredentials, setUser } from "./authSlice";
+import { ResponseMessage, UserPayload } from "./interfaces";
+import { RegisterInputs, LoginInputs } from "../pages/interfaces";
 
 export const authApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    login: builder.mutation<{ accessToken: string }, Inputs>({
+    login: builder.mutation<{ accessToken: string }, LoginInputs>({
       query: (data: {}): string | object | any => ({
         url: "/auth/login",
         method: "POST",
@@ -26,7 +21,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
         } catch (error) {}
       },
     }),
-    registerUser: builder.mutation<any, RegisterInputs>({
+    registerUser: builder.mutation<ResponseMessage, RegisterInputs>({
       query: (data: RegisterInputs): string | object | any => ({
         url: "/auth/register",
         method: "POST",
@@ -35,11 +30,10 @@ export const authApiSlice = apiSlice.injectEndpoints({
       async onQueryStarted(args, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          console.log(data);
         } catch (error) {}
       },
     }),
-    getMe: builder.query<UserPayload, any>({
+    getMe: builder.query<UserPayload, void>({
       query: (): string | object | any => ({
         url: "/auth/me",
         method: "GET",

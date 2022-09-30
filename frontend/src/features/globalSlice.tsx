@@ -5,35 +5,9 @@ import {
   PayloadAction,
 } from "@reduxjs/toolkit";
 import words from "../words-data.txt";
+import { GlobalSliceInitialState } from "./interfaces";
 
-interface Words {
-  wordSet: Set<any>;
-  todaysWord: string;
-}
-
-type grwFnc = () => object;
-
-interface GameOver {
-  isOver: boolean;
-  isWon: boolean;
-}
-
-interface InitialState {
-  board: string[][];
-  currentAttempt: {
-    attempt: number;
-    letterPosition: number;
-  };
-  words: Words;
-  disabledLetters: string[];
-  gameOver: GameOver;
-  displayRules: boolean;
-  displaySettings: boolean;
-  lightTheme: boolean;
-  displayStats: boolean;
-}
-
-const initialState: InitialState = {
+const initialState: GlobalSliceInitialState = {
   board: [
     ["", "", "", "", ""],
     ["", "", "", "", ""],

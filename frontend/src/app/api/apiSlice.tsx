@@ -19,9 +19,6 @@ const baseQuery: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> =
     credentials: "include",
     prepareHeaders: (headers, { getState }) => {
       const accessToken: string = (getState() as any).auth.access_token;
-      // console.log("Access token prepare headers:", accessToken);
-      // console.log("Get state:", getState() as any);
-      // console.log("Access token", accessToken);
       if (accessToken) {
         headers.set("authorization", `Bearer ${accessToken}`);
       }
@@ -42,7 +39,6 @@ const baseQueryWithReauth = async (
 
   let result: QueryReturnValue<unknown, FetchBaseQueryError, {}> =
     await baseQuery(args, api, extraOptions);
-  // console.log("Result of reauth:", result);
 
   if (result.error) {
     if (
@@ -67,11 +63,9 @@ const baseQueryWithReauth = async (
             result = await baseQuery(args, api, extraOptions);
           } else {
             api.dispatch(logOut());
-            // localStorage.setItem("logged_in", "false");
             // window.location.href = "/login";
           }
         } finally {
-          // release must be called once the mutex should be released again.
           release();
         }
       }

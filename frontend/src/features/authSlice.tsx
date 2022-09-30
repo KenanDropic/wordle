@@ -1,22 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Types } from "mongoose";
+import { AuthSliceInitialState, User } from "./interfaces";
 
-export interface User {
-  _id: Types.ObjectId;
-  username: string;
-  email: string;
-  password: string;
-  isEmailConfirmed: boolean;
-  role: string;
-  refreshToken: string[];
-}
-
-interface InitialState {
-  user: User | null;
-  access_token: string | null;
-}
-
-const initialState: InitialState = {
+const initialState: AuthSliceInitialState = {
   user: null,
   access_token: localStorage.getItem("token")
     ? localStorage.getItem("token")
@@ -32,7 +17,6 @@ const authSlice = createSlice({
       localStorage.setItem("token", action.payload.accessToken);
     },
     logOut: (state) => {
-      // console.log("LOGOUT");
       state.user = null;
       state.access_token = null;
       localStorage.removeItem("token");

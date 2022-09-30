@@ -1,19 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { StatsSliceInitialState, Stats } from "./interfaces";
 
-export interface Stats {
-  attempts: number;
-  currentStreak: number;
-  guessDistribution: {};
-  maxStreak?: number;
-  winRate: number;
-  numOfWins: number;
-}
-
-interface InitialState {
-  stats: Stats | null;
-}
-
-const initialState: InitialState = {
+const initialState: StatsSliceInitialState = {
   stats: null,
 };
 

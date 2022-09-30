@@ -14,7 +14,6 @@ export const statsApiSlice = apiSlice.injectEndpoints({
       async onQueryStarted(args, { dispatch, queryFulfilled }) {
         try {
           const { data: stats } = await queryFulfilled;
-          // set user stats
           dispatch(setUserStats((stats as any)?.data));
         } catch (error) {}
       },
