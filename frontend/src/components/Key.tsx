@@ -7,15 +7,7 @@ import {
 } from "../features/globalSlice";
 import { useAppDispatch, useAppSelector } from "../features/hooks/hooks";
 import { useUpdateStatsMutation } from "../features/statsApiSlice";
-import { StatsData, updateFN } from "./Keyboard";
-
-interface KeyValues {
-  value: string;
-  bigKey?: boolean;
-  shouldDisable?: boolean;
-}
-
-type ClickFn = () => void;
+import { StatsData, KeyValues, updateFN, clickFN } from "./interfaces";
 
 const Key: React.FC<KeyValues> = ({ value, bigKey, shouldDisable }) => {
   let streak: number = localStorage.getItem("streak")
@@ -39,7 +31,7 @@ const Key: React.FC<KeyValues> = ({ value, bigKey, shouldDisable }) => {
     await updateStats(data);
   };
 
-  const handleClick: ClickFn = () => {
+  const handleClick: clickFN = () => {
     if (value === "ENTER") {
       if (currentAttempt.letterPosition !== 5) return;
       // form a word with entered letters
@@ -101,11 +93,7 @@ const Key: React.FC<KeyValues> = ({ value, bigKey, shouldDisable }) => {
       id={`${bigKey ? "big" : shouldDisable && "disabled"}`}
       onClick={handleClick}
     >
-      {value === "DELETE" ? (
-        <i className="fa-solid fa-delete-left" style={{ fontSize: "30px" }}></i>
-      ) : (
-        value
-      )}
+      {value === "DELETE" ? <i className="fa-solid fa-delete-left"></i> : value}
     </div>
   );
 };

@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { setDisabledLettersArray } from "../features/globalSlice";
 import { useAppDispatch, useAppSelector } from "../features/hooks/hooks";
+import { LetterProps } from "./interfaces";
 
-interface Props {
-  letterPosition: number;
-  attemptValue: number;
-}
-
-const Letter: React.FC<Props> = ({ attemptValue, letterPosition }) => {
+const Letter: React.FC<LetterProps> = ({ attemptValue, letterPosition }) => {
   const [letterState, setLetterState] = useState<string>();
   const [flipState, setFlipState] = useState<string>();
   const dispatch = useAppDispatch();

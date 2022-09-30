@@ -1,14 +1,8 @@
 import React from "react";
 import Letter from "./Letter";
-import { boardDefault } from "./Words";
-import { useAppSelector } from "../features/hooks/hooks";
+import { boardDefault } from "./BoardDefault";
 
 const Board: React.FC = () => {
-  const {
-    gameOver: { isOver },
-    displayRules,
-  } = useAppSelector((state) => state.global);
-
   const letterLength: number = boardDefault.length - 1;
   const letterArray: number[] = Array.from(
     { length: letterLength },
@@ -23,10 +17,6 @@ const Board: React.FC = () => {
 
   return (
     <>
-      <i
-        className={`fa-solid fa-arrows-rotate ${isOver ? "active" : ""} `}
-        onClick={() => window.location.reload()}
-      ></i>
       <div className="board">
         {boardArray.map((row: number, idx: number) => {
           return (

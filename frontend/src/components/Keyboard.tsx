@@ -6,20 +6,10 @@ import {
   setLetterPosition,
 } from "../features/globalSlice";
 import { useAppDispatch, useAppSelector } from "../features/hooks/hooks";
-import {
-  useLazyGetStatsQuery,
-  useUpdateStatsMutation,
-} from "../features/statsApiSlice";
+import { useUpdateStatsMutation } from "../features/statsApiSlice";
 import GameEnd from "./GameEnd";
+import { StatsData, updateFN } from "./interfaces";
 import Key from "./Key";
-
-export interface StatsData {
-  streak: number;
-  guessedInAttempt: number;
-  isWon: boolean;
-}
-
-export type updateFN = (data: StatsData) => Promise<void>;
 
 const Keyboard: React.FC = () => {
   let streak: number = localStorage.getItem("streak")
@@ -36,7 +26,6 @@ const Keyboard: React.FC = () => {
   } = useAppSelector((state) => state.global);
 
   // stats endpoints
-  const [getStats] = useLazyGetStatsQuery();
   const [updateStats] = useUpdateStatsMutation();
 
   const keys1: string[] = ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"];

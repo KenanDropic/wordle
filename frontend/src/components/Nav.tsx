@@ -3,11 +3,7 @@ import { NavigateFunction, useNavigate } from "react-router-dom";
 import { showRules, showSettings, showStats } from "../features/globalSlice";
 import { useAppDispatch, useAppSelector } from "../features/hooks/hooks";
 import useLocalStorage from "../utils/useLocalStorage";
-
-type clickFN = (
-  event: React.MouseEvent<HTMLElement | HTMLOrSVGElement>,
-  destination: string
-) => void;
+import { NavClickFN } from "./interfaces";
 
 const Nav: React.FC = () => {
   const [logged, setLogged] = useLocalStorage("logged_in", "");
@@ -15,7 +11,7 @@ const Nav: React.FC = () => {
   const { lightTheme } = useAppSelector((state) => state.global);
   const navigate: NavigateFunction = useNavigate();
 
-  const handleClick: clickFN = (event, destination) => {
+  const handleClick: NavClickFN = (event, destination) => {
     switch (destination) {
       case "rules":
         dispatch(showRules());
