@@ -6,6 +6,7 @@
   height: calc(100vh - 170px);
   @include flexSettings(flex, column, center, "");
   padding-top: 50px;
+  position: relative;
 }
 
 .board {
@@ -51,16 +52,32 @@
 }
 
 .fa-arrows-rotate {
-  font-size: 30px;
+  font-size: 20px;
   cursor: pointer;
   position: absolute;
-  left: 5%;
-  top: 9%;
-  transform: translateX(-250%);
+  left: 10%;
+  top: 2%;
+  transform: translateX(-50%);
+  opacity: 0;
+  display: none;
+
+  @media (min-width: 550px) {
+    left: 20%;
+  }
+  @media (min-width: 750px) {
+    left: 30%;
+  }
+  @media (min-width: 1280px) {
+    left: 33%;
+  }
+  @media (min-width: 1450px) {
+    left: 36%;
+  }
 
   &.active {
-    transform: translateX(0%);
     transition: transform 0.5s ease-in;
+    opacity: 1;
+    display: block;
   }
 }
 #correct {
