@@ -1,6 +1,6 @@
 import { apiSlice } from "../app/api/apiSlice";
-import { StatsData } from "../components/Keyboard";
 import { setUserStats } from "./statsSlice";
+import { StatsData } from "../components/interfaces";
 
 export const statsApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({

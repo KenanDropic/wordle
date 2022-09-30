@@ -15,6 +15,7 @@ connectDB();
 
 import auth from "./routes/auth";
 import stats from "./routes/stats";
+import path from "path";
 
 const app: Application = express();
 
@@ -31,11 +32,17 @@ app.use(cookieParser());
 app.use("/api/v1/auth", auth);
 app.use("/api/v1/stats", stats);
 
-app.get("/", (req: Request, res: any) => {
-  res.send("API is running...");
-});
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "/frontend/dist")));
 
-const PORT = process.env.PORT;
+  app.get("*", (req, res) => res.sendFile(path.resolve("frontend", "dist")));
+} else {
+  app.get("/", (req: Request, res: any) => {
+    res.send("API is running...");
+  });
+}
+
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(
