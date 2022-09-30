@@ -6,23 +6,19 @@ import {
   useLoginMutation,
   useLogoutUserMutation,
 } from "../features/authApiSlice";
-import { logOut, setUser, User } from "../features/authSlice";
+import { logOut, setUser } from "../features/authSlice";
 import { useAppDispatch, useAppSelector } from "../features/hooks/hooks";
+import { User } from "../features/interfaces";
 import useLocalStorage from "../utils/useLocalStorage";
+import { LoginInputs } from "./interfaces";
 import Logout from "./Logout";
 
 type pwdFN = (value: React.SetStateAction<boolean>) => void;
 
-export type Inputs = {
-  email: string;
-  password: string;
-};
-
 const Login: React.FC = () => {
   const [showPwd, setShowPwd] = useState<boolean>(false);
   const [logged, setLogged] = useLocalStorage("logged_in", "");
-  const [theme, seetTheme] = useLocalStorage("theme", "");
-
+  const [theme, setTheme] = useLocalStorage("theme", "");
   const effectRan = useRef<boolean>(false);
 
   // use form hook
@@ -30,7 +26,7 @@ const Login: React.FC = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<Inputs>({});
+  } = useForm<LoginInputs>({});
 
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
@@ -44,10 +40,10 @@ const Login: React.FC = () => {
 
   // get logged user
   const getCurrentUser: () => Promise<void> = async () => {
-    await getMe(null).unwrap();
+    await getMe().unwrap();
   };
 
-  const onSubmit = async (data: Inputs) => {
+  const onSubmit = async (data: LoginInputs) => {
     await login({
       email: data.email,
       password: data.password,

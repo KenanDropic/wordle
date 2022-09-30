@@ -5,12 +5,8 @@ import { ErrorResponse } from "../utils/errResponse";
 import { NextFunction, Request, Response } from "express";
 
 export const authenticate = asyncHandler(
-  async (req: any, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     let token: string | undefined;
-
-    console.log("Trigger AUTH middleware".green.bold);
-
-    // console.log("Request cookies: middleware", req.cookies);
 
     let authHeader = req.headers.authorization;
 

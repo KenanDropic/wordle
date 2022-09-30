@@ -4,22 +4,15 @@ import { Link, NavigateFunction, useNavigate } from "react-router-dom";
 import { useRegisterUserMutation } from "../features/authApiSlice";
 import { useAppDispatch, useAppSelector } from "../features/hooks/hooks";
 import useLocalStorage from "../utils/useLocalStorage";
-
-export type RegisterInputs = {
-  username: string;
-  email: string;
-  password: string;
-};
+import { RegisterInputs } from "./interfaces";
 
 const Register: React.FC = () => {
   const [showPwd, setShowPwd] = useState<boolean>(false);
   const [theme, setTheme] = useLocalStorage("theme", "");
-
   const navigate: NavigateFunction = useNavigate();
 
   const dispatch = useAppDispatch();
   const { lightTheme } = useAppSelector((state) => state.global);
-
   const [registerUser, { error, isSuccess }] = useRegisterUserMutation();
 
   const {

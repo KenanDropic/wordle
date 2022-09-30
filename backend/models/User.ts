@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Document, Schema, Types } from "mongoose";
 import jwt from "jsonwebtoken";
 
 export interface UserT extends Document {
@@ -11,6 +11,7 @@ export interface UserT extends Document {
   confirmEmailExpire: Date;
   role: string;
   refreshToken: string[];
+  stats: Types.ObjectId;
   matchPasswords: (enteredPassword: string) => Promise<boolean>;
   getAccessToken: () => string;
   getRefreshToken: () => string;
@@ -51,6 +52,10 @@ const UserSchema: Schema = new Schema<UserT>(
       default: "user",
     },
     refreshToken: [String],
+    stats: {
+      type: Schema.Types.ObjectId,
+      ref: "Stats",
+    },
   },
   {
     versionKey: false,
@@ -81,7 +86,9 @@ UserSchema.methods.getAccessToken = function () {
 
 // refresh token
 UserSchema.methods.getRefreshToken = function () {
-  return jwt.sign({ id: this.id }, `${process.env.REFRESH_TOKEN_SECRET}`);
+  return jwt.sign({ id: this.id }, `${process.env.REFRESH_TOKEN_SECRET}`, {
+    expiresIn: process.env.REFRESH_TOKEN_EXPIRE,
+  });
 };
 
 export default mongoose.model<UserT>("User", UserSchema);

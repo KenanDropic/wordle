@@ -48,7 +48,14 @@ export const register = async (
   });
 
   const access_token: string = user.getAccessToken();
-  // const refresh_token: string = user.getRefreshToken();
+  const refresh_token: string = user.getRefreshToken();
+
+  res.cookie("jwt", refresh_token, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    //maxAge: 60 * 60 * 1000,
+  });
 
   await user.save();
   await stats.save();
@@ -94,6 +101,8 @@ export const login = async (
     ? user.refreshToken
     : user.refreshToken.filter((rt) => rt !== cookies.jwt);
 
+  console.log("Cookie jwt:", cookies.jwt);
+
   if (cookies?.jwt) {
     // 1) User logs in but never uses RT and does not logout
     // 2) RT is stolen
@@ -123,10 +132,10 @@ export const login = async (
     httpOnly: true,
     secure: true,
     sameSite: "none",
-    maxAge: 60 * 60 * 1000,
+    //maxAge: 60 * 60 * 1000,
   });
 
-  // Send access token & refresh token to user
+  // Send access token to user
   return res.json({
     accessToken: access_token,
   });
