@@ -32,9 +32,11 @@ app.use("/api/v1/auth", auth);
 app.use("/api/v1/stats", stats);
 
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join("/frontend/dist")));
+  app.use(express.static(path.join(__dirname, "frontend/dist")));
 
-  app.get("/", (req, res) => res.sendFile(path.resolve("frontend", "dist")));
+  app.get("*", (req, res) =>
+    res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"))
+  );
 } else {
   app.get("/", (req: Request, res: any) => {
     res.send("API is running...");
@@ -45,6 +47,6 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(
-    `Server running in ${process.env.NODE_ENV} on port ${PORT}`.yellow.bold
+    `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.yellow.bold
   );
 });
