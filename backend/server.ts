@@ -32,10 +32,11 @@ app.use("/api/v1/auth", auth);
 app.use("/api/v1/stats", stats);
 
 if (process.env.NODE_ENV === "production") {
+  const __dirname = path.resolve();
   app.use(express.static(path.join(__dirname, "frontend/dist")));
 
   app.get("*", (req, res) =>
-    res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"))
+    res.sendFile(path.resolve(__dirname, "frontend", "dist", "manifest.json"))
   );
 } else {
   app.get("/", (req: Request, res: any) => {
