@@ -9,13 +9,12 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import corsOptions from "./config/corsOptions";
 import credentials from "./middleware/credentials";
-
-dotenv.config();
-connectDB();
-
 import auth from "./routes/auth";
 import stats from "./routes/stats";
 import path from "path";
+
+dotenv.config();
+connectDB();
 
 const app: Application = express();
 
@@ -33,9 +32,9 @@ app.use("/api/v1/auth", auth);
 app.use("/api/v1/stats", stats);
 
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "/frontend/dist")));
+  app.use(express.static(path.join("/frontend/dist")));
 
-  app.get("*", (req, res) => res.sendFile(path.resolve("frontend", "dist")));
+  app.get("/", (req, res) => res.sendFile(path.resolve("frontend", "dist")));
 } else {
   app.get("/", (req: Request, res: any) => {
     res.send("API is running...");
