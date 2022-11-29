@@ -8,6 +8,7 @@ import {
 import { useAppDispatch, useAppSelector } from "../features/hooks/hooks";
 import { useUpdateStatsMutation } from "../features/statsApiSlice";
 import { StatsData, KeyValues, updateFN, clickFN } from "./interfaces";
+import { wordsSet } from "../words";
 
 const Key: React.FC<KeyValues> = ({ value, bigKey, shouldDisable }) => {
   let streak: number = localStorage.getItem("streak")
@@ -16,7 +17,7 @@ const Key: React.FC<KeyValues> = ({ value, bigKey, shouldDisable }) => {
   const dispatch = useAppDispatch();
   const {
     currentAttempt,
-    words: { todaysWord, wordSet },
+    words: { todaysWord },
     board,
   } = useAppSelector((state) => state.global);
   const [updateStats] = useUpdateStatsMutation();
@@ -41,7 +42,7 @@ const Key: React.FC<KeyValues> = ({ value, bigKey, shouldDisable }) => {
       }
 
       // check if word we entered is inside words txt
-      if (wordSet.has(`${guessedWord.toLowerCase()}\r`)) {
+      if (wordsSet.has(`${guessedWord.toLowerCase()}`)) {
         dispatch(setAttempt());
 
         // word guessed correct - end game
@@ -61,7 +62,7 @@ const Key: React.FC<KeyValues> = ({ value, bigKey, shouldDisable }) => {
         if (
           currentAttempt.attempt === 5 &&
           guessedWord.toLowerCase() !== todaysWord &&
-          wordSet.has(`${guessedWord.toLowerCase()}\r`)
+          wordsSet.has(`${guessedWord.toLowerCase()}`)
         ) {
           localStorage.setItem("streak", "0");
           streak = 0;
