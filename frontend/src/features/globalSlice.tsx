@@ -51,6 +51,7 @@ export const getRandomWord: AsyncThunk<
     const data: Response = await fetch(
       "https://wordle-f32h.onrender.com/words"
     );
+    console.log("Words data:", data);
     const result: string = await data.text();
     const resultArray = result.split("\n");
     todaysWord = resultArray[Math.floor(Math.random() * resultArray.length)];
