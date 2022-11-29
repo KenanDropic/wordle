@@ -5,6 +5,7 @@ import { useLazyGetMeQuery } from "../features/authApiSlice";
 import useLocalStorage from "../utils/useLocalStorage";
 import { Board, Keyboard, Nav, Rules, Settings, Stats } from "../components";
 import { setWords } from "../features/globalSlice";
+import words from "../words-data.txt";
 
 const Home: React.FC = () => {
   const [logged, setLogged] = useLocalStorage("logged_in", "");
@@ -24,17 +25,14 @@ const Home: React.FC = () => {
     getWords();
   }, []);
 
-  const getWords = async () => {
-    const data = await (
-      await fetch("https://wordle-f32h.onrender.com/words")
-    ).text();
+  async function getWords() {
+    const data = await (await fetch(words)).text();
     const resultArray = data.split("\n");
     const todaysWord =
       resultArray[Math.floor(Math.random() * resultArray.length)];
 
     dispatch(setWords({ words: resultArray, word: todaysWord }));
-    console.log("Words data: ", data);
-  };
+  }
 
   const getCurrentUser: () => Promise<void> = async () => {
     await getMe().unwrap();
