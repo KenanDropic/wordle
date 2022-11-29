@@ -33,6 +33,10 @@ app.use("/api/v1/stats", stats);
 
 if (process.env.NODE_ENV === "production") {
   const __dirname = path.resolve();
+  app.use(
+    "/words",
+    express.static(path.join(__dirname, "/frontend/src/words-data.txt"))
+  );
   app.use(express.static(path.join(__dirname, "frontend/dist")));
 
   app.get("*", (req, res) =>

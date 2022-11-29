@@ -30,7 +30,6 @@ const Home: React.FC = () => {
     if (effectRan.current === false && logged) {
       getCurrentUser();
     }
-
     return () => {
       effectRan.current = true;
     };

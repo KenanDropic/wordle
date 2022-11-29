@@ -9,14 +9,13 @@ lerna-debug.log*
 
 node_modules
 /node_modules
-/frontend/src/words-data.txt
+./frontend/src/words-data.txt
 dist
 dist-ssr
 *.local
 .env
 
 wordle-css.txt
-./frontend/src/words-data.txt
 
 # Editor directories and files
 .vscode/*

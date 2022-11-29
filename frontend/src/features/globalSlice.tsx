@@ -33,7 +33,7 @@ const initialState: GlobalSliceInitialState = {
   displaySettings: false,
   lightTheme:
     localStorage.getItem("theme")! !== ""
-      ? localStorage.getItem("theme")!
+      ? JSON.parse(localStorage.getItem("theme")!)
       : false,
   displayStats: false,
 };
@@ -118,7 +118,6 @@ const globalSlice = createSlice({
       ) {
         state.words.todaysWord = action.payload?.todaysWord.trim();
         state.words.wordSet = new Set(action.payload?.resultArray);
-        console.log("Words set: ", action.payload.resultArray);
       }
     });
   },
