@@ -4,7 +4,6 @@ import {
   createSlice,
   PayloadAction,
 } from "@reduxjs/toolkit";
-import words from "../words-data.txt";
 import { GlobalSliceInitialState } from "./interfaces";
 
 const initialState: GlobalSliceInitialState = {
@@ -49,7 +48,9 @@ export const getRandomWord: AsyncThunk<
 > = createAsyncThunk("words/getRandom", async () => {
   try {
     let todaysWord: string;
-    const data: Response = await fetch(words);
+    const data: Response = await fetch(
+      "https://wordle-f32h.onrender.com/words"
+    );
     const result: string = await data.text();
     const resultArray = result.split("\n");
     todaysWord = resultArray[Math.floor(Math.random() * resultArray.length)];
@@ -117,6 +118,7 @@ const globalSlice = createSlice({
         action.payload.resultArray.length > 0
       ) {
         state.words.todaysWord = action.payload?.todaysWord.trim();
+        console.log("Action payload wordset:", action.payload.resultArray);
         state.words.wordSet = new Set(action.payload?.resultArray);
       }
     });

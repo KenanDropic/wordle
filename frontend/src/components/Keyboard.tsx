@@ -54,7 +54,7 @@ const Keyboard: React.FC = () => {
 
         // check if word we entered is inside words txt
         if (wordSet.has(`${guessedWord.toLowerCase()}\r`)) {
-          console.log("Word set:", wordSet);
+          console.log("Word set:", wordSet.has(`${guessedWord.toLowerCase()}`));
           dispatch(setAttempt());
 
           // word guessed correct - end game

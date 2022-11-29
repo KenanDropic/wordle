@@ -57,6 +57,8 @@ export const register = async (
     //maxAge: 60 * 60 * 1000,
   });
 
+  user.refreshToken.push(refresh_token);
+
   await user.save();
   await stats.save();
 
