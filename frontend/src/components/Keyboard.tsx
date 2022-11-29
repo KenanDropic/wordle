@@ -10,6 +10,7 @@ import { useUpdateStatsMutation } from "../features/statsApiSlice";
 import GameEnd from "./GameEnd";
 import { StatsData, updateFN } from "./interfaces";
 import Key from "./Key";
+import { wordsSet } from "../words";
 
 const Keyboard: React.FC = () => {
   let streak: number = localStorage.getItem("streak")
@@ -20,7 +21,7 @@ const Keyboard: React.FC = () => {
   const {
     currentAttempt,
     board,
-    words: { wordSet, todaysWord },
+    words: { todaysWord },
     disabledLetters,
     gameOver,
   } = useAppSelector((state) => state.global);
@@ -53,8 +54,7 @@ const Keyboard: React.FC = () => {
         }
 
         // check if word we entered is inside words txt
-        if (wordSet.has(`${guessedWord.toLowerCase()}\r`)) {
-          console.log("Word set:", wordSet.has(`${guessedWord.toLowerCase()}`));
+        if (wordsSet.has(`${guessedWord.toLowerCase()}`)) {
           dispatch(setAttempt());
 
           // word guessed correct - end game

@@ -20,7 +20,6 @@ const initialState: GlobalSliceInitialState = {
     letterPosition: 0,
   },
   words: {
-    wordSet: new Set(),
     todaysWord: "",
   },
   disabledLetters: [],
@@ -70,12 +69,8 @@ const globalSlice = createSlice({
       const { attempt, letterPosition } = state.currentAttempt;
       state.board[attempt][letterPosition] = action.payload;
     },
-    setWords: (
-      state,
-      action: PayloadAction<{ words: string[]; word: string }>
-    ) => {
-      state.words.wordSet = new Set(action.payload.words);
-      state.words.todaysWord = action.payload.word.trim();
+    setWords: (state, action: PayloadAction<string>) => {
+      state.words.todaysWord = action.payload.trim();
     },
     setLetterPosition: (state, action: PayloadAction<string>) => {
       let operator = action.payload;

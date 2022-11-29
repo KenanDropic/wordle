@@ -1,11 +1,10 @@
 import { useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "../features/hooks/hooks";
 import { useLazyGetMeQuery } from "../features/authApiSlice";
-// import { getRandomWord } from "../features/globalSlice";
 import useLocalStorage from "../utils/useLocalStorage";
 import { Board, Keyboard, Nav, Rules, Settings, Stats } from "../components";
 import { setWords } from "../features/globalSlice";
-import words from "../words-data.txt";
+import words from "../words";
 
 const Home: React.FC = () => {
   const [logged, setLogged] = useLocalStorage("logged_in", "");
@@ -21,18 +20,15 @@ const Home: React.FC = () => {
   const [getMe, { error }] = useLazyGetMeQuery();
 
   useEffect(() => {
-    // dispatch(getRandomWord());
-    getWords();
+    setupWords();
   }, []);
 
-  async function getWords() {
-    const data = await (await fetch(words)).text();
-    const resultArray = data.split("\n");
+  const setupWords = () => {
+    const resultArray = words.split(",");
     const todaysWord =
       resultArray[Math.floor(Math.random() * resultArray.length)];
-
-    dispatch(setWords({ words: resultArray, word: todaysWord }));
-  }
+    dispatch(setWords(todaysWord));
+  };
 
   const getCurrentUser: () => Promise<void> = async () => {
     await getMe().unwrap();

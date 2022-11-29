@@ -2,7 +2,6 @@ import { Types } from "mongoose";
 
 /* GLOBAL SLICE */
 interface Words {
-  wordSet: Set<any>;
   todaysWord: string;
 }
 interface GameOver {
