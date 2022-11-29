@@ -20,7 +20,7 @@ interface GlobalSliceInitialState {
   gameOver: GameOver;
   displayRules: boolean;
   displaySettings: boolean;
-  lightTheme: boolean;
+  lightTheme: string | boolean;
   displayStats: boolean;
 }
 /* AUTH SLICE */
