@@ -37,30 +37,30 @@ const initialState: GlobalSliceInitialState = {
   displayStats: false,
 };
 
-export const getRandomWord: AsyncThunk<
-  | {
-      resultArray: string[];
-      todaysWord: string;
-    }
-  | undefined,
-  void,
-  {}
-> = createAsyncThunk("words/getRandom", async () => {
-  try {
-    let todaysWord: string;
-    const data: Response = await fetch(
-      "https://wordle-f32h.onrender.com/words"
-    );
-    console.log("Words data:", data);
-    const result: string = await data.text();
-    const resultArray = result.split("\n");
-    todaysWord = resultArray[Math.floor(Math.random() * resultArray.length)];
+// export const getRandomWord: AsyncThunk<
+//   | {
+//       resultArray: string[];
+//       todaysWord: string;
+//     }
+//   | undefined,
+//   void,
+//   {}
+// > = createAsyncThunk("words/getRandom", async () => {
+//   try {
+//     let todaysWord: string;
+//     const data: Response = await fetch(
+//       "https://wordle-f32h.onrender.com/words"
+//     );
+//     console.log("Words data:", data.text());
+//     const result: string = await data.text();
+//     const resultArray = result.split("\n");
+//     todaysWord = resultArray[Math.floor(Math.random() * resultArray.length)];
 
-    return { resultArray, todaysWord };
-  } catch (error: any) {
-    console.log(error.message);
-  }
-});
+//     return { resultArray, todaysWord };
+//   } catch (error: any) {
+//     console.log(error.message);
+//   }
+// });
 
 const globalSlice = createSlice({
   name: "global",
@@ -69,6 +69,13 @@ const globalSlice = createSlice({
     setBoard: (state, action: PayloadAction<string>) => {
       const { attempt, letterPosition } = state.currentAttempt;
       state.board[attempt][letterPosition] = action.payload;
+    },
+    setWords: (
+      state,
+      action: PayloadAction<{ words: string[]; word: string }>
+    ) => {
+      state.words.wordSet = new Set(action.payload.words);
+      state.words.todaysWord = action.payload.word.trim();
     },
     setLetterPosition: (state, action: PayloadAction<string>) => {
       let operator = action.payload;
@@ -112,22 +119,23 @@ const globalSlice = createSlice({
       return initialState;
     },
   },
-  extraReducers(builder) {
-    builder.addCase(getRandomWord.fulfilled, (state, action) => {
-      if (
-        action.payload?.todaysWord !== undefined &&
-        action.payload.resultArray.length > 0
-      ) {
-        state.words.todaysWord = action.payload?.todaysWord.trim();
-        console.log("Action payload wordset:", action.payload.resultArray);
-        state.words.wordSet = new Set(action.payload?.resultArray);
-      }
-    });
-  },
+  // extraReducers(builder) {
+  //   builder.addCase(getRandomWord.fulfilled, (state, action) => {
+  //     if (
+  //       action.payload?.todaysWord !== undefined &&
+  //       action.payload.resultArray.length > 0
+  //     ) {
+  //       state.words.todaysWord = action.payload?.todaysWord.trim();
+  //       console.log("Action payload wordset:", action.payload.resultArray);
+  //       state.words.wordSet = new Set(action.payload?.resultArray);
+  //     }
+  //   });
+  // },
 });
 
 export const {
   setBoard,
+  setWords,
   setLetterPosition,
   setAttempt,
   setDisabledLettersArray,
