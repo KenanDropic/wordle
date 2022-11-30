@@ -3,8 +3,6 @@ import { useAppDispatch, useAppSelector } from "../features/hooks/hooks";
 import { useLazyGetMeQuery } from "../features/authApiSlice";
 import useLocalStorage from "../utils/useLocalStorage";
 import { Board, Keyboard, Nav, Rules, Settings, Stats } from "../components";
-import { setWords } from "../features/globalSlice";
-import words from "../words";
 
 const Home: React.FC = () => {
   const [logged, setLogged] = useLocalStorage("logged_in", "");
@@ -12,30 +10,19 @@ const Home: React.FC = () => {
   const {
     gameOver: { isOver },
   } = useAppSelector((state) => state.global);
+  const { user } = useAppSelector((state) => state.auth);
 
-  const dispatch = useAppDispatch();
   const { displayRules, displaySettings, displayStats, lightTheme } =
     useAppSelector((state) => state.global);
 
   const [getMe, { error }] = useLazyGetMeQuery();
-
-  useEffect(() => {
-    setupWords();
-  }, []);
-
-  const setupWords = () => {
-    const resultArray = words.split(",");
-    const todaysWord =
-      resultArray[Math.floor(Math.random() * resultArray.length)];
-    dispatch(setWords(todaysWord));
-  };
 
   const getCurrentUser: () => Promise<void> = async () => {
     await getMe().unwrap();
   };
 
   useEffect(() => {
-    if (effectRan.current === false && logged) {
+    if (effectRan.current === false && logged && user == null) {
       getCurrentUser();
     }
     return () => {

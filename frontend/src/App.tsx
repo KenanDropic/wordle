@@ -3,9 +3,25 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import { CookiesProvider } from "react-cookie";
-import 'vite/modulepreload-polyfill'
+import "vite/modulepreload-polyfill";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import words from "./words";
+import { setWords } from "./features/globalSlice";
 
 const App: React.FC = () => {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    setupWords();
+  }, []);
+
+  const setupWords = () => {
+    const resultArray = words.split(",");
+    const todaysWord =
+      resultArray[Math.floor(Math.random() * resultArray.length)];
+    dispatch(setWords(todaysWord));
+  };
+
   return (
     <>
       <CookiesProvider>
