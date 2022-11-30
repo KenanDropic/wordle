@@ -30,7 +30,7 @@ If the letter is not in the word it will be marked as gray/black.
 
 ---
 
-## Licenca
+## Licence
 
 MIT Licenca
 
