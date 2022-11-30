@@ -31,6 +31,8 @@ app.use(cookieParser());
 app.use("/api/v1/auth", auth);
 app.use("/api/v1/stats", stats);
 
+app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
+
 if (process.env.NODE_ENV === "production") {
   const __dirname = path.resolve();
   app.use(express.static(path.join(__dirname, "frontend/dist")));
