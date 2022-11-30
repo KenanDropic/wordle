@@ -10,7 +10,7 @@ export interface UserT extends Document {
   confirmEmailToken: string;
   confirmEmailExpire: Date;
   role: string;
-  refreshToken: string[];
+  refreshToken: string | null;
   stats: Types.ObjectId;
   matchPasswords: (enteredPassword: string) => Promise<boolean>;
   getAccessToken: () => string;
@@ -51,7 +51,7 @@ const UserSchema: Schema = new Schema<UserT>(
       enum: ["user", "admin"],
       default: "user",
     },
-    refreshToken: [String],
+    refreshToken: String,
     stats: {
       type: Schema.Types.ObjectId,
       ref: "Stats",

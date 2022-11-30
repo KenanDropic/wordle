@@ -40,7 +40,10 @@ const Letter: React.FC<LetterProps> = ({ attemptValue, letterPosition }) => {
   }, [currentAttempt.attempt]);
 
   return (
-    <div className={`letter ${flipState}`} id={letterState}>
+    <div
+      className={`letter ${flipState !== undefined ? flipState : ""}`}
+      id={letterState}
+    >
       {letter}
     </div>
   );

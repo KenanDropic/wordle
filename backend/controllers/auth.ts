@@ -57,8 +57,7 @@ export const register = async (
     //maxAge: 60 * 60 * 1000,
   });
 
-  user.refreshToken.push(refresh_token);
-
+  user.refreshToken = refresh_token;
   await user.save();
   await stats.save();
 
@@ -99,34 +98,7 @@ export const login = async (
   const access_token: string = user.getAccessToken();
   const refresh_token: string = user.getRefreshToken();
 
-  let newRTArray = !cookies?.jwt
-    ? user.refreshToken
-    : user.refreshToken.filter((rt) => rt !== cookies.jwt);
-
-  console.log("Cookie jwt:", cookies.jwt);
-
-  if (cookies?.jwt) {
-    // 1) User logs in but never uses RT and does not logout
-    // 2) RT is stolen
-    // 3) If 1 & 2, reuse detection is needed to clear all RTs when user logs in
-
-    const refreshToken = cookies.jwt;
-    const foundToken = await User.findOne({ refreshToken }).exec();
-
-    // Detected refresh token reuse!
-    if (!foundToken) {
-      // clear out ALL previous refresh tokens
-      newRTArray = [];
-    }
-
-    res.clearCookie("jwt", {
-      httpOnly: true,
-      sameSite: "none",
-      secure: true,
-    });
-  }
-
-  user.refreshToken = [...newRTArray, refresh_token];
+  user.refreshToken = refresh_token;
   await user.save();
 
   // Creates Secure Cookie with refresh token
@@ -154,6 +126,7 @@ export const handleRefreshToken = async (
   const cookies = req.cookies;
   if (!cookies?.jwt) return res.sendStatus(401);
   const refreshToken: string = cookies.jwt;
+
   res.clearCookie("jwt", {
     httpOnly: true,
     sameSite: "none",
@@ -186,7 +159,7 @@ export const handleRefreshToken = async (
         if (decoded !== undefined) {
           hackedUser = await User.findOne((decoded as any).id);
           if (hackedUser !== null) {
-            hackedUser.refreshToken = [];
+            hackedUser.refreshToken = null;
             await hackedUser.save();
           }
         }
@@ -195,10 +168,6 @@ export const handleRefreshToken = async (
     // console.log("FORBIDEEEEN");
     return res.sendStatus(403); //Forbidden
   }
-  const newRTArray = user.refreshToken.filter((rt) => rt !== refreshToken);
-
-  // console.log("New refresh token array:", newRTArray);
-
   // evaluate jwt
   jwt.verify(
     refreshToken,
@@ -209,7 +178,7 @@ export const handleRefreshToken = async (
     ) => {
       if (err) {
         // expired refresh token
-        user.refreshToken = [...newRTArray];
+        user.refreshToken = null;
         await user.save();
       }
       if (decoded !== undefined) {
@@ -220,14 +189,14 @@ export const handleRefreshToken = async (
       const access_token = user.getAccessToken();
       const new_refresh_token = user.getRefreshToken();
       // Saving refreshToken with current user
-      user.refreshToken = [...newRTArray, new_refresh_token];
+      user.refreshToken = new_refresh_token;
       await user.save();
       // Creates Secure Cookie with refresh token
       res.cookie("jwt", new_refresh_token, {
         httpOnly: true,
         secure: true,
         sameSite: "none",
-        maxAge: 60 * 60 * 1000,
+        //maxAge: 60 * 60 * 1000,
       });
 
       res.json({ accessToken: access_token });
@@ -286,7 +255,7 @@ export const handleLogout = async (req: any, res: any) => {
   }
 
   // Delete refreshToken in db
-  user.refreshToken = user.refreshToken.filter((rt) => rt !== refreshToken);
+  user.refreshToken = null;
   await user.save();
   // console.log(result);
 

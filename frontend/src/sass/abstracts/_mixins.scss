@@ -34,7 +34,7 @@
   margin: 5px;
   font-size: $fnt-size * 1px;
 }
-@mixin statsContainerResponsive($mx-w, $h){
+@mixin statsContainerResponsive($mx-w, $h) {
   max-width: $mx-w * 1px;
   height: $h * 1%;
 }

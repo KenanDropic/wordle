@@ -18,9 +18,8 @@ const baseQuery: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> =
     // baseUrl: "http://127.0.0.1:5000/api/v1", baseUrl for development
     baseUrl: "https://wordle-f32h.onrender.com/api/v1/", // baseURL for production
     credentials: "include",
-    prepareHeaders: (headers, { getState, endpoint }) => {
+    prepareHeaders: (headers, { getState }) => {
       const accessToken: string = (getState() as any).auth.access_token;
-      console.log(endpoint);
       if (accessToken) {
         headers.set("authorization", `Bearer ${accessToken}`);
       }
